@@ -1,9 +1,7 @@
 package com.escuelajavag4.catalogservice.model.entity;
 
 import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -14,7 +12,8 @@ import java.time.LocalDateTime;
 @Table(name = "products")
 @Getter
 @Setter
-@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class Product {
 
     @Id
@@ -54,17 +53,6 @@ public class Product {
     @UpdateTimestamp
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
-
-    public Product() {
-    }
-
-    public Product(String code, String name, BigDecimal price, Category category, Marca marca) {
-        this.code = code;
-        this.name = name;
-        this.price = price;
-        this.category = category;
-        this.marca = marca;
-    }
 
     @PrePersist
     public void prePersist() {

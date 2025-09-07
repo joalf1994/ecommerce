@@ -1,19 +1,32 @@
 # Maven
 target/
+.mvn/wrapper/maven-wrapper.jar
 *.class
 *.jar
 *.war
+out/
 
 # IDEs
 .idea/
 *.iml
+*.swp
+*.iws
+*.ipr
 .vscode/
 
 # Logs
 *.log
+logs/
+*/logs/
 
 # Docker
-docker-compose.override.yml
+*.pid
+docker-data/
+volumes/
+*/volumes/
 
-# Otros archivos generados
-*.tmp
+# Entornos
+.env
+!.env.example  # sí subimos el ejemplo
+
+

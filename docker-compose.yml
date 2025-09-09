@@ -1,31 +1,46 @@
 services:
   # --- Customer Service ---
-  customer-db:
-    image: postgres:17-alpine
-    container_name: customer-db
-    restart: always
-    environment:
-      POSTGRES_DB: customerdb
-      POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-    ports:
-      - "5432:5432"
-    volumes:
-      - ./volumes/customer-db:/var/lib/postgresql/data
+#  customer-db:
+#    image: postgres:17-alpine
+#    container_name: customer-db
+#    restart: always
+#    environment:
+#      POSTGRES_DB: customerdb
+#      POSTGRES_USER: ${DB_USER}
+#      POSTGRES_PASSWORD: ${DB_PASSWORD}
+#    ports:
+#      - "5432:5432"
+#    volumes:
+#      - ./volumes/customer-db:/var/lib/postgresql/data
 
-  customer-service:
-      build: ./customer-service
-      container_name: customer-service
-      depends_on:
-        - customer-db
-      environment:
-        SPRING_PROFILES_ACTIVE: prod
-        DB_HOST: customer-db
-        DB_NAME: customerdb
-        DB_USER: ${DB_USER}
-        DB_PASSWORD: ${DB_PASSWORD}
-      ports:
-        - "8080:8080"
+#  customer-service:
+#      build: ./customer-service
+#      container_name: customer-service
+#      depends_on:
+#        - customer-db
+#      environment:
+#        SPRING_PROFILES_ACTIVE: prod
+#        DB_HOST: customer-db
+#        DB_NAME: customerdb
+#        DB_USER: ${DB_USER}
+#        DB_PASSWORD: ${DB_PASSWORD}
+#      ports:
+#        - "8080:8080"
+
+
+  inventory-service:
+    build: ./inventory-service
+    container_name: inventory-service
+    depends_on:
+      - db_inventory
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      DB_HOST: db_inventory
+      DB_NAME: inventorydb
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "8080:8080"
 
   # --- Order Service ---
 #  order-db:
@@ -70,18 +85,19 @@ services:
 #    volumes:
 #      - db_catalogo_data:/var/lib/postgresql/data
 #
-#  db_inventory:
-#    image: postgres:17-alpine
-#    container_name: db_inventory
-#    restart: always
-#    environment:
-#      POSTGRES_USER: postgres
-#      POSTGRES_PASSWORD: postgres
-#      POSTGRES_DB: inventorydb
-#    ports:
-#      - "5435:5432"
-#    volumes:
-#      - db_inventory_data:/var/lib/postgresql/data
+  db_inventory:
+    image: postgres:17-alpine
+    container_name: db_inventory
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: inventorydb
+    ports:
+      - "5435:5432"
+    volumes:
+      - db_inventory_data:/var/lib/postgresql/data
+
 #
 #  db_payment:
 #    image: postgres:17-alpine
@@ -112,11 +128,7 @@ services:
 volumes:
   db_customer_data:
 #  db_catalogo_data:
-#  db_inventory_data:
+  db_inventory_data:
 #  db_order_data:
 #  db_payment_data:
 #  db_notification_data:
-
-
-
-

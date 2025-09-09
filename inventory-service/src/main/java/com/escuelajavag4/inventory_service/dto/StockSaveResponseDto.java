@@ -1,13 +1,8 @@
 package com.escuelajavag4.inventory_service.dto;
 
-import lombok.Getter;
-import lombok.Setter;
-
 import java.util.Date;
 
-@Getter
-@Setter
-public class StockDto {
+public class StockSaveResponseDto {
     private Long stockId;
     private Long productId;
     private Long warehouseId;
@@ -15,5 +10,4 @@ public class StockDto {
     private int reserved;
     private Date createdAt;
     private Date  updatedAt;
-
 }

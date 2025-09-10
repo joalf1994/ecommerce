@@ -1,8 +1,8 @@
 package com.escuelajavag4.catalogservice.mapper;
 
-import com.escuelajavag4.catalogservice.model.dto.CategoryCreateRequestDto;
-import com.escuelajavag4.catalogservice.model.dto.CategoryResponseDto;
-import com.escuelajavag4.catalogservice.model.dto.CategoryUpdateRequestDto;
+import com.escuelajavag4.catalogservice.model.dto.request.CategoryCreateRequestDto;
+import com.escuelajavag4.catalogservice.model.dto.response.CategoryResponseDto;
+import com.escuelajavag4.catalogservice.model.dto.request.CategoryUpdateRequestDto;
 import com.escuelajavag4.catalogservice.model.entity.Category;
 import org.mapstruct.*;
 

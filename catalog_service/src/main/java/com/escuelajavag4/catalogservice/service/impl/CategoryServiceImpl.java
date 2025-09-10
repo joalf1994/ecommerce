@@ -1,34 +1,32 @@
 package com.escuelajavag4.catalogservice.service.impl;
 
-import com.escuelajavag4.catalogservice.exception.CategoryAlreadyExistsException;
-import com.escuelajavag4.catalogservice.exception.CategoryHasProductsException;
-import com.escuelajavag4.catalogservice.exception.CategoryNotFoundException;
+import com.escuelajavag4.catalogservice.exception.DuplicateResourceException;
+import com.escuelajavag4.catalogservice.exception.ResourceHasDependenciesException;
+import com.escuelajavag4.catalogservice.exception.ResourceNotFoundException;
 import com.escuelajavag4.catalogservice.mapper.CategoryMapper;
-import com.escuelajavag4.catalogservice.model.dto.CategoryCreateRequestDto;
-import com.escuelajavag4.catalogservice.model.dto.CategoryResponseDto;
-import com.escuelajavag4.catalogservice.model.dto.CategoryUpdateRequestDto;
+import com.escuelajavag4.catalogservice.model.dto.request.CategoryCreateRequestDto;
+import com.escuelajavag4.catalogservice.model.dto.response.CategoryResponseDto;
+import com.escuelajavag4.catalogservice.model.dto.request.CategoryUpdateRequestDto;
 import com.escuelajavag4.catalogservice.model.entity.Category;
 import com.escuelajavag4.catalogservice.repository.CategoryRepository;
 import com.escuelajavag4.catalogservice.service.CategoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 @Transactional
 public class CategoryServiceImpl implements CategoryService {
+
     private final CategoryRepository categoryRepository;
     private final CategoryMapper categoryMapper;
 
     @Override
     public CategoryResponseDto createCategory(CategoryCreateRequestDto createRequestDto) {
-
         if (categoryRepository.existsByNameIgnoreCase(createRequestDto.getName())) {
-            throw new CategoryAlreadyExistsException("Ya existe una categoría con el nombre: " + createRequestDto.getName());
+            throw new DuplicateResourceException("Categoría", "nombre", createRequestDto.getName());
         }
 
         Category category = categoryMapper.toEntity(createRequestDto);
@@ -47,7 +45,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Transactional(readOnly = true)
     public CategoryResponseDto getCategoryById(Long id) {
         Category category = categoryRepository.findById(id)
-                .orElseThrow(() -> new CategoryNotFoundException("Categoría no encontrada con ID: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Categoría", id));
         return categoryMapper.toResponseDto(category);
     }
 
@@ -55,18 +53,16 @@ public class CategoryServiceImpl implements CategoryService {
     @Transactional(readOnly = true)
     public CategoryResponseDto getCategoryByIdWithProducts(Long id) {
         Category category = categoryRepository.findById(id)
-                .orElseThrow(() -> new CategoryNotFoundException("Categoría no encontrada con ID: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Categoría", id));
         return categoryMapper.toResponseDtoWithProducts(category);
     }
 
     @Override
     @Transactional(readOnly = true)
     public CategoryResponseDto getCategoryByName(String name) {
-        Optional<Category> categoryOpt = categoryRepository.findByNameIgnoreCase(name);
-        if (categoryOpt.isEmpty()) {
-            throw new CategoryNotFoundException("Categoría no encontrada con nombre: " + name);
-        }
-        return categoryMapper.toResponseDto(categoryOpt.get());
+        Category category = categoryRepository.findByNameIgnoreCase(name)
+                .orElseThrow(() -> new ResourceNotFoundException("Categoría", name));
+        return categoryMapper.toResponseDto(category);
     }
 
     @Override
@@ -79,52 +75,54 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public CategoryResponseDto updateCategory(Long id, CategoryUpdateRequestDto updateRequestDto) {
         Category existingCategory = categoryRepository.findById(id)
-                .orElseThrow(() -> new CategoryNotFoundException("Categoría no encontrada con ID: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Categoría", id));
 
         if (updateRequestDto.getName() != null &&
                 !updateRequestDto.getName().equalsIgnoreCase(existingCategory.getName()) &&
                 categoryRepository.existsByNameIgnoreCase(updateRequestDto.getName())) {
-            throw new CategoryAlreadyExistsException("Ya existe una categoría con el nombre: " + updateRequestDto.getName());
+            throw new DuplicateResourceException("Categoría", "nombre", updateRequestDto.getName());
         }
 
         categoryMapper.updateEntityFromDto(updateRequestDto, existingCategory);
         Category updatedCategory = categoryRepository.save(existingCategory);
-
         return categoryMapper.toResponseDto(updatedCategory);
-    }
-
-    @Override
-    public void deactivateCategory(Long id) {
-
-        Category category = categoryRepository.findById(id)
-                .orElseThrow(() -> new CategoryNotFoundException("Categoría no encontrada con ID: " + id));
-
-        category.setActive(false);
-        categoryRepository.save(category);
     }
 
     @Override
     public CategoryResponseDto activateCategory(Long id) {
         Category category = categoryRepository.findById(id)
-                .orElseThrow(() -> new CategoryNotFoundException("Categoría no encontrada con ID: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Categoría", id));
 
         category.setActive(true);
         Category activatedCategory = categoryRepository.save(category);
         return categoryMapper.toResponseDto(activatedCategory);
-
     }
 
     @Override
-    public void deleteCategory(Long id) {
-
+    public void deactivateCategory(Long id) {
         Category category = categoryRepository.findById(id)
-                .orElseThrow(() -> new CategoryNotFoundException("Categoría no encontrada con ID: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Categoría", id));
 
         if (!category.getProducts().isEmpty()) {
-            throw new CategoryHasProductsException("No se puede eliminar la categoría porque tiene productos asociados");
+            throw new ResourceHasDependenciesException("Categoría", "productos");
+        }
+
+        category.setActive(false);
+        categoryRepository.save(category);
+    }
+
+
+
+    @Override
+    public void deleteCategory(Long id) {
+        Category category = categoryRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Categoría", id));
+
+        if (!category.getProducts().isEmpty()) {
+            throw new ResourceHasDependenciesException("Categoría", "productos");
         }
 
         categoryRepository.deleteById(id);
     }
-
 }
+

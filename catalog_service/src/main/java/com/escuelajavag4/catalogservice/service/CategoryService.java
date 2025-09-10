@@ -1,10 +1,8 @@
 package com.escuelajavag4.catalogservice.service;
 
-import com.escuelajavag4.catalogservice.model.dto.CategoryCreateRequestDto;
-import com.escuelajavag4.catalogservice.model.dto.CategoryResponseDto;
-import com.escuelajavag4.catalogservice.model.dto.CategoryUpdateRequestDto;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import com.escuelajavag4.catalogservice.model.dto.request.CategoryCreateRequestDto;
+import com.escuelajavag4.catalogservice.model.dto.response.CategoryResponseDto;
+import com.escuelajavag4.catalogservice.model.dto.request.CategoryUpdateRequestDto;
 
 import java.util.List;
 

@@ -1,9 +1,9 @@
-package com.escuelajavag4.catalogservice.exception.handler;
+package com.escuelajavag4.catalogservice.controller.handler;
 
 import com.escuelajavag4.catalogservice.exception.DuplicateResourceException;
 import com.escuelajavag4.catalogservice.exception.ResourceHasDependenciesException;
 import com.escuelajavag4.catalogservice.exception.ResourceNotFoundException;
-import com.escuelajavag4.catalogservice.model.dto.ErrorResponse;
+import com.escuelajavag4.catalogservice.model.dto.response.ErrorResponse;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;

@@ -27,6 +27,5 @@ volumes/
 
 # Entornos
 .env
-!.env.example  # sí subimos el ejemplo
 
 

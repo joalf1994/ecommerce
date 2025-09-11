@@ -1,4 +1,4 @@
-package com.escuelajavag4.catalogservice.model.dto.request;
+package com.escuelajavag4.catalogservice.model.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

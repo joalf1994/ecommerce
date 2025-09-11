@@ -1,8 +1,8 @@
 package com.escuelajavag4.catalogservice.mapper;
 
-import com.escuelajavag4.catalogservice.model.dto.ProductCreateRequestDto;
-import com.escuelajavag4.catalogservice.model.dto.ProductResponseDto;
-import com.escuelajavag4.catalogservice.model.dto.ProductUpdateRequestDto;
+import com.escuelajavag4.catalogservice.model.dto.request.ProductCreateRequestDto;
+import com.escuelajavag4.catalogservice.model.dto.response.ProductResponseDto;
+import com.escuelajavag4.catalogservice.model.dto.request.ProductUpdateRequestDto;
 import com.escuelajavag4.catalogservice.model.entity.Category;
 import com.escuelajavag4.catalogservice.model.entity.Marca;
 import com.escuelajavag4.catalogservice.model.entity.Product;

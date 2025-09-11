@@ -28,15 +28,29 @@ services:
 #        - "8080:8080"
 
 
-  inventory-service:
-    build: ./inventory-service
-    container_name: inventory-service
+#  inventory-service:
+#    build: ./inventory-service
+#    container_name: inventory-service
+#    depends_on:
+#      - db_inventory
+#    environment:
+#      SPRING_PROFILES_ACTIVE: prod
+#      DB_HOST: db_inventory
+#      DB_NAME: inventorydb
+#      DB_USER: ${DB_USER}
+#      DB_PASSWORD: ${DB_PASSWORD}
+#    ports:
+#      - "8080:8080"
+
+  notification-service:
+    build: ./notification-service
+    container_name: notification-service
     depends_on:
-      - db_inventory
+      - db_notification
     environment:
       SPRING_PROFILES_ACTIVE: prod
-      DB_HOST: db_inventory
-      DB_NAME: inventorydb
+      DB_HOST: db_notification
+      DB_NAME: notificationdb
       DB_USER: ${DB_USER}
       DB_PASSWORD: ${DB_PASSWORD}
     ports:
@@ -85,18 +99,18 @@ services:
 #    volumes:
 #      - db_catalogo_data:/var/lib/postgresql/data
 #
-  db_inventory:
-    image: postgres:17-alpine
-    container_name: db_inventory
-    restart: always
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: inventorydb
-    ports:
-      - "5435:5432"
-    volumes:
-      - db_inventory_data:/var/lib/postgresql/data
+#  db_inventory:
+#    image: postgres:17-alpine
+#    container_name: db_inventory
+#    restart: always
+#    environment:
+#      POSTGRES_USER: postgres
+#      POSTGRES_PASSWORD: postgres
+#      POSTGRES_DB: inventorydb
+#    ports:
+#      - "5435:5432"
+#    volumes:
+#      - db_inventory_data:/var/lib/postgresql/data
 
 #
 #  db_payment:
@@ -112,23 +126,23 @@ services:
 #    volumes:
 #      - db_payment_data:/var/lib/postgresql/data
 #
-#  db_notification:
-#    image: postgres:17-alpine
-#    container_name: db_notification
-#    restart: always
-#    environment:
-#      POSTGRES_USER: postgres
-#      POSTGRES_PASSWORD: postgres
-#      POSTGRES_DB: notificationdb
-#    ports:
-#      - "5438:5432"
-#    volumes:
-#      - db_notification_data:/var/lib/postgresql/data
+  db_notification:
+    image: postgres:17-alpine
+    container_name: db_notification
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: notificationdb
+    ports:
+      - "5438:5432"
+    volumes:
+      - db_notification_data:/var/lib/postgresql/data
 
 volumes:
-  db_customer_data:
+#  db_customer_data:
 #  db_catalogo_data:
-  db_inventory_data:
+#  db_inventory_data:
 #  db_order_data:
 #  db_payment_data:
-#  db_notification_data:
+  db_notification_data:

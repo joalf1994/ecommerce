@@ -1,8 +1,8 @@
 package com.escuelajavag4.catalogservice.mapper;
 
-import com.escuelajavag4.catalogservice.model.dto.request.CategoryCreateRequestDto;
-import com.escuelajavag4.catalogservice.model.dto.response.CategoryResponseDto;
-import com.escuelajavag4.catalogservice.model.dto.request.CategoryUpdateRequestDto;
+import com.escuelajavag4.catalogservice.model.dto.CategoryCreateRequestDto;
+import com.escuelajavag4.catalogservice.model.dto.CategoryResponseDto;
+import com.escuelajavag4.catalogservice.model.dto.CategoryUpdateRequestDto;
 import com.escuelajavag4.catalogservice.model.entity.Category;
 import org.mapstruct.*;
 
@@ -28,15 +28,9 @@ public interface CategoryMapper {
 
 
     @Mapping(target = "products", ignore = true)
-    @Named("simple")
     CategoryResponseDto toResponseDto(Category entity);
 
-    @Named("withProducts")
     CategoryResponseDto toResponseDtoWithProducts(Category entity);
 
-    @IterableMapping(qualifiedByName = "simple")
     List<CategoryResponseDto> toDtoList(List<Category> entities);
-
-    @IterableMapping(qualifiedByName = "withProducts")
-    List<CategoryResponseDto> toDtoListWithProducts(List<Category> entities);
 }

@@ -31,5 +31,4 @@ public class CustomerServiceImpl implements ICustomerService {
                 .orElseThrow(() -> new NotFoundException("Customer with email " + email + " not found"));
         return customerMapper.toDto(customer);
     }
-
 }

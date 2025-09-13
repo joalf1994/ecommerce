@@ -9,9 +9,9 @@ services:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
-      - ./volumes/customer-db:/var/lib/postgresql/data
+      - customer_data:/var/lib/postgresql/data
 
   customer-service:
       build: ./customer-service
@@ -110,7 +110,7 @@ services:
 #      - db_notification_data:/var/lib/postgresql/data
 
 volumes:
-  db_customer_data:
+  customer_data:
 #  db_catalogo_data:
 #  db_inventory_data:
 #  db_order_data:

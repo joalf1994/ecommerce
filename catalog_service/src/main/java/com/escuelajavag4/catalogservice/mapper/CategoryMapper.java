@@ -10,7 +10,7 @@ import java.util.List;
 
 @Mapper(componentModel = "spring", uses = { ProductMapper.class })
 public interface CategoryMapper {
-
+//hola
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "products", ignore = true)

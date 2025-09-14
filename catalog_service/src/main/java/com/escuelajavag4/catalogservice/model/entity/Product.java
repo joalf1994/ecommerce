@@ -25,9 +25,6 @@ public class Product {
     @Column(nullable = false, length = 200)
     private String name;
 
-    @Column(length = 1000)
-    private String description;
-
     @Column(length = 500)
     private String shortDescription;
 

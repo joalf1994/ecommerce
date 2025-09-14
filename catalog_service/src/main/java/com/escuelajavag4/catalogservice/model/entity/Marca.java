@@ -24,9 +24,6 @@ public class Marca {
     @Column(unique = true, nullable = false, length = 100)
     private String name;
 
-    @Column(length = 500)
-    private String description;
-
     @Column(nullable = false)
     private Boolean active;
 

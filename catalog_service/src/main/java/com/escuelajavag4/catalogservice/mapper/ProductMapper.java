@@ -8,44 +8,28 @@ import com.escuelajavag4.catalogservice.model.entity.Marca;
 import com.escuelajavag4.catalogservice.model.entity.Product;
 import org.mapstruct.*;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring",uses = {CategoryMapper.class,MarcaMapper.class})
 public interface ProductMapper {
 
+    // ================== CREATE ==================
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
-    @Mapping(target = "active", defaultValue = "true")
-    @Mapping(target = "category", source = "categoryId", qualifiedByName = "categoryIdToCategory")
-    @Mapping(target = "marca", source = "marcaId", qualifiedByName = "marcaIdToMarca")
+    @Mapping(target = "category", source = "categoryId", qualifiedByName = "fromId")
+    @Mapping(target = "marca", source = "marcaId", qualifiedByName = "fromId")
     Product toEntity(ProductCreateRequestDto dto);
 
-    // Product response sin las colecciones de category y marca para evitar recursión infinita
-    @Mapping(target = "category.products", ignore = true)
-    @Mapping(target = "marca.products", ignore = true)
+    // ================== RESPONSE ==================
+    @Mapping(target = "categoryId", source = "category.id")
+    @Mapping(target = "marcaId", source = "marca.id")
     ProductResponseDto toResponseDto(Product entity);
 
+    // ================== UPDATE ==================
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
-    @Mapping(target = "category", source = "categoryId", qualifiedByName = "categoryIdToCategory")
-    @Mapping(target = "marca", source = "marcaId", qualifiedByName = "marcaIdToMarca")
+    @Mapping(target = "category", source = "categoryId", qualifiedByName = "fromId")
+    @Mapping(target = "marca", source = "marcaId", qualifiedByName = "fromId")
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void updateEntityFromDto(ProductUpdateRequestDto dto, @MappingTarget Product entity);
-
-    // Métodos auxiliares para mapear IDs a entidades
-    @Named("categoryIdToCategory")
-    default Category categoryIdToCategory(Long categoryId) {
-        if (categoryId == null) return null;
-        Category category = new Category();
-        category.setId(categoryId);
-        return category;
-    }
-
-    @Named("marcaIdToMarca")
-    default Marca marcaIdToMarca(Long marcaId) {
-        if (marcaId == null) return null;
-        Marca marca = new Marca();
-        marca.setId(marcaId);
-        return marca;
-    }
 }

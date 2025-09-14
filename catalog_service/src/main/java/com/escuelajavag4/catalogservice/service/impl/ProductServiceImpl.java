@@ -43,7 +43,11 @@ public class ProductServiceImpl implements ProductService {
 
         Product product = productMapper.toEntity(createRequestDto);
         Product savedProduct = productRepository.save(product);
-        return productMapper.toResponseDto(savedProduct);
+        Product reloaded = productRepository.findById(savedProduct.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Producto", savedProduct.getId()));
+
+        return productMapper.toResponseDto(reloaded);
+
     }
 
     @Override

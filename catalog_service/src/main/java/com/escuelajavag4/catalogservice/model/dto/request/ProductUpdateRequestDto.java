@@ -23,9 +23,6 @@ public class ProductUpdateRequestDto {
     @Size(min = 2, max = 200, message = "El nombre debe tener entre 2 y 200 caracteres")
     private String name;
 
-    @Size(max = 1000, message = "La descripción no puede exceder 1000 caracteres")
-    private String description;
-
     @Size(max = 500, message = "La descripción corta no puede exceder 500 caracteres")
     private String shortDescription;
 

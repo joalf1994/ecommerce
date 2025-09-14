@@ -22,9 +22,7 @@ public class ProductCreateRequestDto {
     @Size(min = 2, max = 200, message = "El nombre debe tener entre 2 y 200 caracteres")
     private String name;
 
-    @Size(max = 1000, message = "La descripción no puede exceder 1000 caracteres")
-    private String description;
-
+    @NotBlank(message = "Descripcion obligatoria")
     @Size(max = 500, message = "La descripción corta no puede exceder 500 caracteres")
     private String shortDescription;
 
@@ -39,5 +37,4 @@ public class ProductCreateRequestDto {
     @NotNull(message = "La marca es obligatoria")
     private Long marcaId;
 
-    private Boolean active;
 }

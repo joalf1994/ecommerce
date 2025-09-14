@@ -64,7 +64,6 @@ public class GlobalResponseHandler implements ResponseBodyAdvice<Object> {
                     .status(statusCode)
                     .message(message)
                     .data(body)
-                    .timestamp(LocalDateTime.now())
                     .build();
         }
 

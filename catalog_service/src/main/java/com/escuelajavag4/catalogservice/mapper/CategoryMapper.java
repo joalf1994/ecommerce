@@ -8,16 +8,13 @@ import org.mapstruct.*;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring", uses = { ProductMapper.class })
+@Mapper(componentModel = "spring")
 public interface CategoryMapper {
-//hola
-
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "products", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
     Category toEntity(CategoryCreateRequestDto dto);
-
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "id", ignore = true)
@@ -26,17 +23,24 @@ public interface CategoryMapper {
     @Mapping(target = "updatedAt", ignore = true)
     void updateEntityFromDto(CategoryUpdateRequestDto dto, @MappingTarget Category entity);
 
-
+    @Named("simpleCategory")
     @Mapping(target = "products", ignore = true)
-    @Named("simple")
     CategoryResponseDto toResponseDto(Category entity);
 
     @Named("withProducts")
     CategoryResponseDto toResponseDtoWithProducts(Category entity);
 
-    @IterableMapping(qualifiedByName = "simple")
+    @IterableMapping(qualifiedByName = "simpleCategory")
     List<CategoryResponseDto> toDtoList(List<Category> entities);
 
     @IterableMapping(qualifiedByName = "withProducts")
     List<CategoryResponseDto> toDtoListWithProducts(List<Category> entities);
+
+    @Named("fromId")
+    default Category fromId(Long id) {
+        if (id == null) return null;
+        Category category = new Category();
+        category.setId(id);
+        return category;
+    }
 }

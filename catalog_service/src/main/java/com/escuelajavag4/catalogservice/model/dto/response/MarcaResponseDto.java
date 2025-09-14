@@ -16,14 +16,6 @@ import java.util.Set;
 public class MarcaResponseDto {
     private Long id;
     private String name;
-    private String description;
     private Boolean active;
-
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime createdAt;
-
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime updatedAt;
-
     private Set<ProductResponseDto> products;
 }

@@ -19,3 +19,4 @@ public class MarcaResponseDto {
     private Boolean active;
     private Set<ProductResponseDto> products;
 }
+

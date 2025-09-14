@@ -1,4 +1,4 @@
-package com.escuelajavag4.inventory_service.dto;
+package com.escuelajavag4.inventory_service.model.dto.request;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -7,13 +7,10 @@ import java.util.Date;
 
 @Getter
 @Setter
-public class StockDto {
-    private Long stockId;
+public class StockUpdateRequestDto {
     private Long productId;
     private Long warehouseId;
     private int available;
     private int reserved;
-    private Date createdAt;
     private Date  updatedAt;
-
 }

@@ -43,7 +43,11 @@ public class ProductServiceImpl implements ProductService {
 
         Product product = productMapper.toEntity(createRequestDto);
         Product savedProduct = productRepository.save(product);
-        return productMapper.toResponseDto(savedProduct);
+        Product reloaded = productRepository.findById(savedProduct.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Producto", savedProduct.getId()));
+
+        return productMapper.toResponseDto(reloaded);
+
     }
 
     @Override
@@ -190,9 +194,6 @@ public class ProductServiceImpl implements ProductService {
     public void deleteProduct(Long id) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Producto", id));
-
-        //Ojo, aqui puedo agregar la logica para bloquear eliminacion si existe relacion con algo que pueda
-        //dañar la logica o trazabilidad del negocio
 
         productRepository.deleteById(id);
     }

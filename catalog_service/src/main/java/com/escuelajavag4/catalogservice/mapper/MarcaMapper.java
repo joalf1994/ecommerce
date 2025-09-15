@@ -6,20 +6,20 @@ import com.escuelajavag4.catalogservice.model.dto.request.MarcaUpdateRequestDto;
 import com.escuelajavag4.catalogservice.model.entity.Marca;
 import org.mapstruct.*;
 
-@Mapper(componentModel = "spring", uses = {ProductMapper.class})
+@Mapper(componentModel = "spring")
 public interface MarcaMapper {
+
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "products", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
-    @Mapping(target = "active", defaultValue = "true")
     Marca toEntity(MarcaCreateRequestDto dto);
 
-    // Sin productos para evitar referencia circular
+    @Named("simpleMarca")
     @Mapping(target = "products", ignore = true)
     MarcaResponseDto toResponseDto(Marca entity);
 
-    // Con productos cuando sea necesario
+    @Named("withProducts")
     MarcaResponseDto toResponseDtoWithProducts(Marca entity);
 
     @Mapping(target = "id", ignore = true)
@@ -28,4 +28,12 @@ public interface MarcaMapper {
     @Mapping(target = "updatedAt", ignore = true)
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void updateEntityFromDto(MarcaUpdateRequestDto dto, @MappingTarget Marca entity);
+
+    @Named("fromId")
+    default Marca fromId(Long id) {
+        if (id == null) return null;
+        Marca marca = new Marca();
+        marca.setId(id);
+        return marca;
+    }
 }

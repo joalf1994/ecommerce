@@ -1,4 +1,11 @@
 package com.escuelajavag4.inventory_service.repository;
 
-public interface StockRepository {
+import com.escuelajavag4.inventory_service.model.entity.Stock;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.List;
+
+public interface StockRepository extends JpaRepository<Stock, Long> {
+    boolean existsByProductIdAndWarehouseId(Long productId, Long warehouseId);
+    List<Stock> findByProductId(Long productId);
 }

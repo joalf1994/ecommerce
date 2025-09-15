@@ -3,7 +3,6 @@ package com.escuelajavag4.catalogservice.controller.handler;
 import com.escuelajavag4.catalogservice.model.dto.response.ApiResponse;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.core.MethodParameter;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.server.ServerHttpRequest;
@@ -64,7 +63,6 @@ public class GlobalResponseHandler implements ResponseBodyAdvice<Object> {
                     .status(statusCode)
                     .message(message)
                     .data(body)
-                    .timestamp(LocalDateTime.now())
                     .build();
         }
 

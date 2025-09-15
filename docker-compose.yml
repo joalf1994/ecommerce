@@ -1,5 +1,17 @@
 services:
-  # --- Customer Service ---
+  # --- Eureka Service ---
+  eureka-service:
+    build: ./eureka-service
+    container_name: eureka-service
+    ports:
+      - "8761:8761"
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8761/eureka/apps" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # --- Customer DB ---
   customer-db:
     image: postgres:17-alpine
     container_name: customer-db
@@ -13,11 +25,13 @@ services:
     volumes:
       - customer_data:/var/lib/postgresql/data
 
+  # --- Customer Service ---
   customer-service:
       build: ./customer-service
       container_name: customer-service
       depends_on:
         - customer-db
+        - eureka-service
       environment:
         SPRING_PROFILES_ACTIVE: prod
         DB_HOST: customer-db
@@ -26,6 +40,66 @@ services:
         DB_PASSWORD: ${DB_PASSWORD}
       ports:
         - "8080:8080"
+
+  # --- Catalog DB ---
+  catalog-db:
+    image: postgres:17-alpine
+    container_name: catalog-db
+    restart: always
+    environment:
+      POSTGRES_DB: catalogdb
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "5434:5432"
+    volumes:
+      - catalog_data:/var/lib/postgresql/data
+
+  # --- Catalog Service ---
+  catalog-service:
+    build: ./catalog_service
+    container_name: catalog-service
+    depends_on:
+      - catalog-db
+      - eureka-service
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      DB_HOST: catalog-db
+      DB_NAME: catalogdb
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "8081:8080"
+
+  # --- Inventory DB ---
+  inventory-db:
+    image: postgres:17-alpine
+    container_name: inventory-db
+    restart: always
+    environment:
+      POSTGRES_DB: inventorydb
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "5435:5432"
+    volumes:
+      - inventory_data:/var/lib/postgresql/data
+
+  # --- Inventory Service ---
+  inventory-service:
+    build: ./inventory-service
+    container_name: inventory-service
+    depends_on:
+      - inventory-db
+      - eureka-service
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      DB_HOST: inventory-db
+      DB_NAME: inventorydb
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "8082:8080"
 
   # --- Order Service ---
 #  order-db:
@@ -56,33 +130,6 @@ services:
 #      - "8081:8080"
 
 
-
-#  db_catalogo:
-#    image: postgres:17-alpine
-#    container_name: db_catalogo
-#    restart: always
-#    environment:
-#      POSTGRES_USER: postgres
-#      POSTGRES_PASSWORD: postgres
-#      POSTGRES_DB: catalogdb
-#    ports:
-#      - "5434:5432"
-#    volumes:
-#      - db_catalogo_data:/var/lib/postgresql/data
-#
-#  db_inventory:
-#    image: postgres:17-alpine
-#    container_name: db_inventory
-#    restart: always
-#    environment:
-#      POSTGRES_USER: postgres
-#      POSTGRES_PASSWORD: postgres
-#      POSTGRES_DB: inventorydb
-#    ports:
-#      - "5435:5432"
-#    volumes:
-#      - db_inventory_data:/var/lib/postgresql/data
-#
 #  db_payment:
 #    image: postgres:17-alpine
 #    container_name: db_payment
@@ -111,7 +158,7 @@ services:
 
 volumes:
   customer_data:
-#  db_catalogo_data:
+  catalog_data:
 #  db_inventory_data:
 #  db_order_data:
 #  db_payment_data:

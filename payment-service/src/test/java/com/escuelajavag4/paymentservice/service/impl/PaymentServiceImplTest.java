@@ -111,7 +111,6 @@ class PaymentServiceImplTest {
         assertEquals(responseDto, resultado);
     }
 
-    // ================== BUSCAR TODOS ==================
     @Test
     void buscar_todos_devuelve_lista_de_dtos() {
         Payment payment1 = new Payment();

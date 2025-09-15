@@ -11,5 +11,15 @@ spring:
     show-sql: false
     database-platform: org.hibernate.dialect.PostgreSQLDialect
 
-  config:
-    import: optional:file:../.env[.properties]
+eureka:
+  client:
+    service-url:
+      defaultZone: http://eureka-service:8761/eureka
+    register-with-eureka: true
+    fetch-registry: true
+
+  instance:
+    prefer-ip-address: true
+    hostname: catalog-service
+    lease-renewal-interval-in-seconds: 10
+    lease-expiration-duration-in-seconds: 30

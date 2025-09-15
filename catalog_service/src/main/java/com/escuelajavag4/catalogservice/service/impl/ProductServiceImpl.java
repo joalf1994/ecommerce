@@ -195,9 +195,6 @@ public class ProductServiceImpl implements ProductService {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Producto", id));
 
-        //Ojo, aqui puedo agregar la logica para bloquear eliminacion si existe relacion con algo que pueda
-        //dañar la logica o trazabilidad del negocio
-
         productRepository.deleteById(id);
     }
 }

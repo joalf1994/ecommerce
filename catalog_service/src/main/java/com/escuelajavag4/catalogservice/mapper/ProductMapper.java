@@ -11,7 +11,6 @@ import org.mapstruct.*;
 @Mapper(componentModel = "spring",uses = {CategoryMapper.class,MarcaMapper.class})
 public interface ProductMapper {
 
-    // ================== CREATE ==================
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
@@ -19,12 +18,10 @@ public interface ProductMapper {
     @Mapping(target = "marca", source = "marcaId", qualifiedByName = "fromId")
     Product toEntity(ProductCreateRequestDto dto);
 
-    // ================== RESPONSE ==================
     @Mapping(target = "categoryId", source = "category.id")
     @Mapping(target = "marcaId", source = "marca.id")
     ProductResponseDto toResponseDto(Product entity);
 
-    // ================== UPDATE ==================
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)

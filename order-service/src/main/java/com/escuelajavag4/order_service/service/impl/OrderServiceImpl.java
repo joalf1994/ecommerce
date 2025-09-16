@@ -6,6 +6,7 @@ import com.escuelajavag4.order_service.dto.OrderItemRequestDto;
 import com.escuelajavag4.order_service.dto.OrderRequestDto;
 import com.escuelajavag4.order_service.dto.customer.CustomerDto;
 import com.escuelajavag4.order_service.dto.inventory.StockDto;
+import com.escuelajavag4.order_service.dto.inventory.StockReservedDto;
 import com.escuelajavag4.order_service.dto.product.ProductDto;
 import com.escuelajavag4.order_service.exception.CustomerNotFoundException;
 import com.escuelajavag4.order_service.exception.ProductNotFoundException;
@@ -94,7 +95,7 @@ public class OrderServiceImpl implements IOrderService {
                     StockDto stock = inventoryClient.getStockByProductId(dto.getProductId());
 
                     // reservamos stock, actualizamos el service inventory
-                    inventoryClient.reserveStock(dto.getProductId(), dto.getQty());
+                    StockReservedDto ddd = inventoryClient.reserveStock(dto.getProductId(), dto.getQty());
 
                     //creamos el item
                     OrderItem item = orderItemMapper.toEntity(dto, order);

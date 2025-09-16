@@ -13,7 +13,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.kafka.core.KafkaTemplate;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,10 +31,12 @@ class PaymentServiceImplTest {
     @Mock
     private PaymentMapper paymentMapper;
 
+    @Mock
+    private KafkaTemplate<String, Object> kafkaTemplate;
+
     @InjectMocks
     private PaymentServiceImpl paymentService;
 
-    // ================== CREAR ==================
     @Test
     void crear_pago_existente_lanza_excepcion() {
         PaymentCreateRequestDto dto = new PaymentCreateRequestDto();
@@ -47,6 +51,7 @@ class PaymentServiceImplTest {
     void crear_pago_exitoso_devuelve_dto() {
         PaymentCreateRequestDto dto = new PaymentCreateRequestDto();
         dto.setOrderId(1L);
+        dto.setAmount(BigDecimal.valueOf(100.00));
 
         Payment payment = new Payment();
         Payment savedPayment = new Payment();
@@ -55,6 +60,7 @@ class PaymentServiceImplTest {
         when(paymentRepository.findByOrderId(1L)).thenReturn(Optional.empty());
         when(paymentMapper.toEntity(dto)).thenReturn(payment);
         when(paymentRepository.save(payment)).thenReturn(savedPayment);
+        when(kafkaTemplate.send(anyString(), any())).thenReturn(null);
         when(paymentMapper.toResponseDto(savedPayment)).thenReturn(responseDto);
 
         PaymentResponseDto resultado = paymentService.create(dto);
@@ -63,7 +69,7 @@ class PaymentServiceImplTest {
         verify(paymentRepository).save(payment);
     }
 
-    // ================== ACTUALIZAR ESTADO ==================
+
     @Test
     void actualizar_estado_pago_no_encontrado_lanza_excepcion() {
         PaymentUpdateRequestDto dto = new PaymentUpdateRequestDto();
@@ -90,7 +96,6 @@ class PaymentServiceImplTest {
         verify(paymentRepository).save(payment);
     }
 
-    // ================== BUSCAR POR ID ==================
     @Test
     void buscar_por_id_no_encontrado_lanza_excepcion() {
         when(paymentRepository.findById(1L)).thenReturn(Optional.empty());
@@ -131,7 +136,6 @@ class PaymentServiceImplTest {
         assertTrue(resultado.contains(dto2));
     }
 
-    // ================== ELIMINAR ==================
     @Test
     void eliminar_pago_no_encontrado_lanza_excepcion() {
         when(paymentRepository.existsById(1L)).thenReturn(false);
@@ -148,7 +152,6 @@ class PaymentServiceImplTest {
         verify(paymentRepository).deleteById(1L);
     }
 
-    // ================== BUSCAR POR ORDER ID ==================
     @Test
     void buscar_por_order_id_no_encontrado_lanza_excepcion() {
         when(paymentRepository.findByOrderId(1L)).thenReturn(Optional.empty());

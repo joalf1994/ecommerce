@@ -13,4 +13,6 @@ public class CustomerDto {
     private String fullName;
 
     private String level;
+
+    private Boolean active;
 }

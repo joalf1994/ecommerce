@@ -3,6 +3,8 @@ package com.escuelajavag4.paymentservice.service.impl;
 import com.escuelajavag4.paymentservice.exception.DuplicateResourceException;
 import com.escuelajavag4.paymentservice.exception.ResourceNotFoundException;
 import com.escuelajavag4.paymentservice.mapper.PaymentMapper;
+import com.escuelajavag4.paymentservice.messaging.PaymentEventProducer;
+import com.escuelajavag4.paymentservice.model.dto.PaymentCompletedEvent;
 import com.escuelajavag4.paymentservice.model.dto.PaymentCreateRequestDto;
 import com.escuelajavag4.paymentservice.model.dto.PaymentResponseDto;
 import com.escuelajavag4.paymentservice.model.dto.PaymentUpdateRequestDto;
@@ -25,7 +27,7 @@ public class PaymentServiceImpl implements PaymentService {
 
     private final PaymentRepository paymentRepository;
     private final PaymentMapper paymentMapper;
-    private final KafkaTemplate<String, PaymentResponseDto> kafkaTemplate;
+    private final PaymentEventProducer paymentEventProducer;
 
     @Override
     public PaymentResponseDto create(PaymentCreateRequestDto dto) {
@@ -43,16 +45,15 @@ public class PaymentServiceImpl implements PaymentService {
             throw new IllegalArgumentException("El monto no puede ser negativo");
         }
 
-
         Payment payment = paymentMapper.toEntity(dto);
         Payment saved = paymentRepository.save(payment);
 
-        PaymentResponseDto event = new PaymentResponseDto();
+        PaymentCompletedEvent  event = new PaymentCompletedEvent();
         event.setOrderId(saved.getOrderId());
         event.setAmount(saved.getAmount());
         event.setPaymentId(saved.getPaymentId());
 
-        kafkaTemplate.send("payment-completed-topic", event);
+        paymentEventProducer.emiter(event);
 
         return paymentMapper.toResponseDto(saved);
     }

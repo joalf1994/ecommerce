@@ -10,9 +10,11 @@ import com.escuelajavag4.paymentservice.model.entity.Payment;
 import com.escuelajavag4.paymentservice.repository.PaymentRepository;
 import com.escuelajavag4.paymentservice.service.PaymentService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,6 +25,7 @@ public class PaymentServiceImpl implements PaymentService {
 
     private final PaymentRepository paymentRepository;
     private final PaymentMapper paymentMapper;
+    private final KafkaTemplate<String, PaymentResponseDto> kafkaTemplate;
 
     @Override
     public PaymentResponseDto create(PaymentCreateRequestDto dto) {
@@ -35,10 +38,26 @@ public class PaymentServiceImpl implements PaymentService {
                     );
                 });
 
+
+        if (dto.getAmount().compareTo(BigDecimal.ZERO) < 0) {
+            throw new IllegalArgumentException("El monto no puede ser negativo");
+        }
+
+
         Payment payment = paymentMapper.toEntity(dto);
         Payment saved = paymentRepository.save(payment);
+
+        PaymentResponseDto event = new PaymentResponseDto();
+        event.setOrderId(saved.getOrderId());
+        event.setAmount(saved.getAmount());
+        event.setPaymentId(saved.getPaymentId());
+
+        kafkaTemplate.send("payment-completed-topic", event);
+
         return paymentMapper.toResponseDto(saved);
     }
+
+
     @Override
     public PaymentResponseDto updateStatus(Long paymentId, PaymentUpdateRequestDto dto) {
         Payment payment = paymentRepository.findById(paymentId)

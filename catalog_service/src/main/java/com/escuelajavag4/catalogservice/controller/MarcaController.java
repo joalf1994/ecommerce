@@ -6,6 +6,8 @@ import com.escuelajavag4.catalogservice.model.dto.response.MarcaResponseDto;
 import com.escuelajavag4.catalogservice.service.MarcaService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,49 +20,53 @@ public class MarcaController {
     private final MarcaService marcaService;
 
     @PostMapping
-    public MarcaResponseDto createMarca(@Valid @RequestBody MarcaCreateRequestDto createRequestDto) {
-        return marcaService.createMarca(createRequestDto);
+    public ResponseEntity<MarcaResponseDto> createMarca(
+            @Valid @RequestBody MarcaCreateRequestDto createRequestDto) {
+        MarcaResponseDto response = marcaService.createMarca(createRequestDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @GetMapping
-    public List<MarcaResponseDto> getAllMarcas() {
-        return marcaService.getAllMarcas();
+    public ResponseEntity<List<MarcaResponseDto>> getAllMarcas() {
+        return ResponseEntity.ok(marcaService.getAllMarcas());
     }
 
     @GetMapping("/{id}")
-    public MarcaResponseDto getMarcaById(@PathVariable Long id) {
-        return marcaService.getMarcaById(id);
+    public ResponseEntity<MarcaResponseDto> getMarcaById(@PathVariable Long id) {
+        return ResponseEntity.ok(marcaService.getMarcaById(id));
     }
 
     @GetMapping("/search")
-    public MarcaResponseDto getMarcaByName(@RequestParam String name) {
-        return marcaService.getMarcaByName(name);
+    public ResponseEntity<MarcaResponseDto> getMarcaByName(@RequestParam String name) {
+        return ResponseEntity.ok(marcaService.getMarcaByName(name));
     }
 
     @GetMapping("/active")
-    public List<MarcaResponseDto> getActiveMarcas() {
-        return marcaService.getActiveMarcas();
+    public ResponseEntity<List<MarcaResponseDto>> getActiveMarcas() {
+        return ResponseEntity.ok(marcaService.getActiveMarcas());
     }
 
     @PutMapping("/{id}")
-    public MarcaResponseDto updateMarca(
+    public ResponseEntity<MarcaResponseDto> updateMarca(
             @PathVariable Long id,
             @Valid @RequestBody MarcaUpdateRequestDto updateRequestDto) {
-        return marcaService.updateMarca(id, updateRequestDto);
+        return ResponseEntity.ok(marcaService.updateMarca(id, updateRequestDto));
     }
 
     @PatchMapping("/{id}/activate")
-    public MarcaResponseDto activateMarca(@PathVariable Long id) {
-        return marcaService.activateMarca(id);
+    public ResponseEntity<MarcaResponseDto> activateMarca(@PathVariable Long id) {
+        return ResponseEntity.ok(marcaService.activateMarca(id));
     }
 
     @PatchMapping("/{id}/deactivate")
-    public void deactivateMarca(@PathVariable Long id) {
+    public ResponseEntity<Void> deactivateMarca(@PathVariable Long id) {
         marcaService.deactivateMarca(id);
+        return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/{id}")
-    public void deleteMarca(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteMarca(@PathVariable Long id) {
         marcaService.deleteMarca(id);
+        return ResponseEntity.noContent().build();
     }
 }

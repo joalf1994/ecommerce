@@ -121,7 +121,7 @@ public class OrderServiceImpl implements IOrderService {
     //Llamar a customer-service vía Feign Client → si el cliente no existe o está inactivo → rechazar orden.
     private void validateCustomer(Long customerId) {
         try {
-            customerClient.getCustomerById(customerId);
+            customerClient.getActiveCustomerById(customerId);
         } catch (feign.FeignException.NotFound e) {
             throw new CustomerNotFoundException("Customer with id " + customerId + " not found");
         }

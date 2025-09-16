@@ -5,6 +5,8 @@ import com.escuelajavag4.paymentservice.model.dto.PaymentResponseDto;
 import com.escuelajavag4.paymentservice.model.dto.PaymentUpdateRequestDto;
 import com.escuelajavag4.paymentservice.service.PaymentService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,35 +19,41 @@ public class PaymentController {
     private final PaymentService paymentService;
 
     @PostMapping
-    public PaymentResponseDto create(@RequestBody PaymentCreateRequestDto dto) {
-        return paymentService.create(dto);
+    public ResponseEntity<PaymentResponseDto> create(@RequestBody PaymentCreateRequestDto dto) {
+        PaymentResponseDto response = paymentService.create(dto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PatchMapping("/{paymentId}/status")
-    public PaymentResponseDto updateStatus(
+    public ResponseEntity<PaymentResponseDto> updateStatus(
             @PathVariable Long paymentId,
             @RequestBody PaymentUpdateRequestDto dto
     ) {
-        return paymentService.updateStatus(paymentId, dto);
+        PaymentResponseDto response = paymentService.updateStatus(paymentId, dto);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{paymentId}")
-    public PaymentResponseDto findById(@PathVariable Long paymentId) {
-        return paymentService.findById(paymentId);
+    public ResponseEntity<PaymentResponseDto> findById(@PathVariable Long paymentId) {
+        PaymentResponseDto response = paymentService.findById(paymentId);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/order/{orderId}")
-    public PaymentResponseDto findByOrderId(@PathVariable Long orderId) {
-        return paymentService.findByOrderId(orderId);
+    public ResponseEntity<PaymentResponseDto> findByOrderId(@PathVariable Long orderId) {
+        PaymentResponseDto response = paymentService.findByOrderId(orderId);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping
-    public List<PaymentResponseDto> findAll() {
-        return paymentService.findAll();
+    public ResponseEntity<List<PaymentResponseDto>> findAll() {
+        List<PaymentResponseDto> response = paymentService.findAll();
+        return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/{paymentId}")
-    public void delete(@PathVariable Long paymentId) {
+    public ResponseEntity<Void> delete(@PathVariable Long paymentId) {
         paymentService.delete(paymentId);
+        return ResponseEntity.noContent().build();
     }
 }

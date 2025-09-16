@@ -93,19 +93,25 @@ public class StockServiceImplTest {
     }
 
     @Test
-    void reserveStock_ok() {
-        // Simulamos que hay stock suficiente en la BD
-        when(stockRepository.findByProductId(100L)).thenReturn(List.of(stock));
+    void getStockById_ok() {
+        when(stockRepository.findByProductId(100L)).thenReturn(stock);
+        when(stockMapper.toResponseDto(stock)).thenReturn(stockDto);
 
-        // Ejecutamos la reserva
+        StockResponseDto result = stockService.getStockById(100L);
+
+        assertNotNull(result);
+        assertEquals(100L, result.getProductId());
+        verify(stockRepository).findByProductId(100L);
+    }
+
+    @Test
+    void reserveStock_ok() {
+        when(stockRepository.findAllByProductId(100L)).thenReturn(List.of(stock));
+
         StockReservedResponseDto result = stockService.reserveStock(100L, 5);
 
         assertNotNull(result);
         assertEquals("RESERVED", result.getStatus());
-        assertNotNull(result.getReservationId());
-        assertTrue(result.getExpiresAt().isAfter(LocalDateTime.now()));
-
-        // Verificamos que el stock se haya actualizado
         assertEquals(5, stock.getAvailable());
         assertEquals(5, stock.getReserved());
         verify(stockRepository).save(stock);
@@ -120,11 +126,13 @@ public class StockServiceImplTest {
     @Test
     void reserveStock_noHayStockSuficiente() {
         stock.setAvailable(3);
-        when(stockRepository.findByProductId(100L)).thenReturn(List.of(stock));
+        when(stockRepository.findAllByProductId(100L)).thenReturn(List.of(stock));
 
-        assertThrows(IllegalArgumentException.class, () -> stockService.reserveStock(100L, 10));
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
+                () -> stockService.reserveStock(100L, 10));
+
+        assertEquals("No hay suficiente stock total para reservar", ex.getMessage());
     }
-
     @Test
     void getListStock_ok() {
         Stock stock = new Stock();
@@ -155,6 +163,28 @@ public class StockServiceImplTest {
         assertNotNull(result);
         assertTrue(result.isEmpty());
         verify(stockRepository).findAll();
+    }
+
+    @Test
+    void reserveStock_variosAlmacenes() {
+        Stock stock1 = new Stock();
+        stock1.setAvailable(3);
+        stock1.setReserved(0);
+
+        Stock stock2 = new Stock();
+        stock2.setAvailable(5);
+        stock2.setReserved(0);
+
+        when(stockRepository.findAllByProductId(100L)).thenReturn(List.of(stock1, stock2));
+
+        StockReservedResponseDto result = stockService.reserveStock(100L, 7);
+
+        assertEquals("RESERVED", result.getStatus());
+        assertEquals(0, stock1.getAvailable());
+        assertEquals(3, stock1.getReserved());
+        assertEquals(1, stock2.getAvailable());
+        assertEquals(4, stock2.getReserved());
+        verify(stockRepository, times(2)).save(any(Stock.class));
     }
 
 

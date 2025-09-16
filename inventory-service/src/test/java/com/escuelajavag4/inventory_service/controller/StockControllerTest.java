@@ -44,6 +44,28 @@ class StockControllerTest {
     private StockService stockService;
 
     @Test
+    void testGetStockById() throws Exception {
+        StockResponseDto dto = new StockResponseDto();
+        dto.setStockId(1L);
+        dto.setProductId(100L);
+        dto.setWarehouseId(200L);
+        dto.setAvailable(10);
+        dto.setReserved(0);
+        dto.setCreatedAt(new Date());
+        dto.setUpdatedAt(new Date());
+
+        Mockito.when(stockService.getStockById(100L)).thenReturn(dto);
+
+        mockMvc.perform(get("/inventory/reservations/{productId}", 100L))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.stockId").value(1L))
+                .andExpect(jsonPath("$.productId").value(100L))
+                .andExpect(jsonPath("$.warehouseId").value(200L))
+                .andExpect(jsonPath("$.available").value(10))
+                .andExpect(jsonPath("$.reserved").value(0));
+    }
+
+    @Test
     void testGetListStock() throws Exception {
         StockResponseDto dto = new StockResponseDto();
         dto.setStockId(1L);

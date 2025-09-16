@@ -21,6 +21,11 @@ public class StockController {
         return stockService.getListStock();
     }
 
+    @GetMapping("/{productId}")
+    public StockResponseDto getStockById(@PathVariable Long productId) {
+        return stockService.getStockById(productId);
+    }
+
     @PostMapping
     public StockResponseDto createStock(@RequestBody StockCreateRequestDto stockCreateRequestDto) {
         return  stockService.saveStock(stockCreateRequestDto);

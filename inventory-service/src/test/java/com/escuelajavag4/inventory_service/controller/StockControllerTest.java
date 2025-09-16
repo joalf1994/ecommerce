@@ -129,7 +129,7 @@ class StockControllerTest {
         Mockito.when(stockService.reserveStock(eq(100L), eq(5)))
                 .thenReturn(reservedDto);
 
-        mockMvc.perform(patch("/inventory/reservations/{productId}/reserve", 100L)
+        mockMvc.perform(put("/inventory/reservations/{productId}/reserve", 100L)
                         .param("cantidad", "5"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("RESERVED"))

@@ -1,6 +1,40 @@
 spring:
   application:
-    name:  notification-service
-  autoconfigure:
-    exclude:
-      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+    name: notification-service
+  datasource:
+    url: jdbc:h2:file:./data/notificationdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password: password
+    driver-class-name: org.h2.Driver
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+    database-platform: org.hibernate.dialect.H2Dialect
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: notification-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "com.escuelajavag4.notification_service.model.dto.request"
+        spring.json.use.type.headers: false
+    listener:
+      ack-mode: manual
+
+server:
+  port: 8082
+
+logging:
+  level:
+    com.escuelajavag4.notification_service: DEBUG
+    org.apache.kafka: WARN

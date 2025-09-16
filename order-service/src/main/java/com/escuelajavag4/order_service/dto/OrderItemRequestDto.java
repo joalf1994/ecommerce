@@ -7,9 +7,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Builder
-public class OrderItemDto {
+public class OrderItemRequestDto {
     private Long productId;
     private Integer qty;
-    private Double unitPrice;
-    private Double subtotal;
 }

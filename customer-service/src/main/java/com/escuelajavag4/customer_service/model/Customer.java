@@ -28,5 +28,7 @@ public class Customer {
 
     private String level;
 
+    private Boolean active;
+
     private LocalDateTime createdAt;
 }

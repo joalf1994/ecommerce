@@ -33,6 +33,11 @@ public class StockServiceImpl implements StockService {
     }
 
     @Override
+    public StockResponseDto getStockById(Long productId) {
+        return stockMapper.toResponseDto(stockRepository.findByProductId(productId));
+    }
+
+    @Override
     public StockResponseDto saveStock(StockCreateRequestDto stockCreateRequestDto) {
 
         if (stockRepository.existsByProductIdAndWarehouseId(
@@ -58,7 +63,7 @@ public class StockServiceImpl implements StockService {
 
     @Override
     public StockReservedResponseDto reserveStock(Long productId, int cantidad) {
-        List<Stock> stockList = stockRepository.findByProductId(productId).stream().toList();
+        List<Stock> stockList = stockRepository.findAllByProductId(productId).stream().toList();
 
         if (cantidad <= 0) {
             throw new IllegalArgumentException("La cantidad a reservar debe ser mayor a 0");

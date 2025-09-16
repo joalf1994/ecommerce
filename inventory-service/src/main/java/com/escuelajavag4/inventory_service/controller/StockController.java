@@ -31,7 +31,7 @@ public class StockController {
         return  stockService.saveStock(stockCreateRequestDto);
     }
 
-    @PatchMapping("/{productId}/reserve")
+    @PutMapping("/{productId}/reserve")
     public StockReservedResponseDto reserveStock(
             @PathVariable Long productId,
             @RequestParam int cantidad

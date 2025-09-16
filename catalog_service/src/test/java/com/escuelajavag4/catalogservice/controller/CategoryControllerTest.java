@@ -10,9 +10,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import java.util.List;
-
 import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -42,9 +42,11 @@ public class CategoryControllerTest {
 
         when(categoryService.createCategory(request)).thenReturn(sampleCategory);
 
-        CategoryResponseDto result = categoryController.createCategory(request);
-        assertNotNull(result);
-        assertEquals("Electronics", result.getName());
+        ResponseEntity<CategoryResponseDto> response = categoryController.createCategory(request);
+
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals("Electronics", response.getBody().getName());
 
         verify(categoryService).createCategory(request);
     }
@@ -53,9 +55,11 @@ public class CategoryControllerTest {
     void testGetAllCategories() {
         when(categoryService.getAllCategories()).thenReturn(List.of(sampleCategory));
 
-        List<CategoryResponseDto> result = categoryController.getAllCategories();
-        assertNotNull(result);
-        assertEquals(1, result.size());
+        ResponseEntity<List<CategoryResponseDto>> response = categoryController.getAllCategories();
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals(1, response.getBody().size());
 
         verify(categoryService).getAllCategories();
     }
@@ -64,9 +68,11 @@ public class CategoryControllerTest {
     void testGetCategoryById() {
         when(categoryService.getCategoryById(1L)).thenReturn(sampleCategory);
 
-        CategoryResponseDto result = categoryController.getCategoryById(1L);
-        assertNotNull(result);
-        assertEquals(1L, result.getId());
+        ResponseEntity<CategoryResponseDto> response = categoryController.getCategoryById(1L);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals(1L, response.getBody().getId());
 
         verify(categoryService).getCategoryById(1L);
     }
@@ -75,8 +81,10 @@ public class CategoryControllerTest {
     void testGetCategoryByIdWithProducts() {
         when(categoryService.getCategoryByIdWithProducts(1L)).thenReturn(sampleCategory);
 
-        CategoryResponseDto result = categoryController.getCategoryByIdWithProducts(1L);
-        assertNotNull(result);
+        ResponseEntity<CategoryResponseDto> response = categoryController.getCategoryByIdWithProducts(1L);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
 
         verify(categoryService).getCategoryByIdWithProducts(1L);
     }
@@ -85,9 +93,11 @@ public class CategoryControllerTest {
     void testGetCategoryByName() {
         when(categoryService.getCategoryByName("Electronics")).thenReturn(sampleCategory);
 
-        CategoryResponseDto result = categoryController.getCategoryByName("Electronics");
-        assertNotNull(result);
-        assertEquals("Electronics", result.getName());
+        ResponseEntity<CategoryResponseDto> response = categoryController.getCategoryByName("Electronics");
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals("Electronics", response.getBody().getName());
 
         verify(categoryService).getCategoryByName("Electronics");
     }
@@ -96,9 +106,11 @@ public class CategoryControllerTest {
     void testGetActiveCategories() {
         when(categoryService.getActiveCategories()).thenReturn(List.of(sampleCategory));
 
-        List<CategoryResponseDto> result = categoryController.getActiveCategories();
-        assertNotNull(result);
-        assertTrue(result.get(0).getActive());
+        ResponseEntity<List<CategoryResponseDto>> response = categoryController.getActiveCategories();
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertTrue(response.getBody().get(0).getActive());
 
         verify(categoryService).getActiveCategories();
     }
@@ -115,9 +127,11 @@ public class CategoryControllerTest {
 
         when(categoryService.updateCategory(1L, updateRequest)).thenReturn(updatedCategory);
 
-        CategoryResponseDto result = categoryController.updateCategory(1L, updateRequest);
-        assertNotNull(result);
-        assertEquals("Updated Electronics", result.getName());
+        ResponseEntity<CategoryResponseDto> response = categoryController.updateCategory(1L, updateRequest);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals("Updated Electronics", response.getBody().getName());
 
         verify(categoryService).updateCategory(1L, updateRequest);
     }
@@ -126,7 +140,10 @@ public class CategoryControllerTest {
     void testDeactivateCategory() {
         doNothing().when(categoryService).deactivateCategory(1L);
 
-        categoryController.deactivateCategory(1L);
+        ResponseEntity<Void> response = categoryController.deactivateCategory(1L);
+
+        assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
+        assertNull(response.getBody());
 
         verify(categoryService).deactivateCategory(1L);
     }
@@ -135,9 +152,11 @@ public class CategoryControllerTest {
     void testActivateCategory() {
         when(categoryService.activateCategory(1L)).thenReturn(sampleCategory);
 
-        CategoryResponseDto result = categoryController.activateCategory(1L);
-        assertNotNull(result);
-        assertTrue(result.getActive());
+        ResponseEntity<CategoryResponseDto> response = categoryController.activateCategory(1L);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertTrue(response.getBody().getActive());
 
         verify(categoryService).activateCategory(1L);
     }
@@ -146,7 +165,10 @@ public class CategoryControllerTest {
     void testDeleteCategory() {
         doNothing().when(categoryService).deleteCategory(1L);
 
-        categoryController.deleteCategory(1L);
+        ResponseEntity<Void> response = categoryController.deleteCategory(1L);
+
+        assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
+        assertNull(response.getBody());
 
         verify(categoryService).deleteCategory(1L);
     }

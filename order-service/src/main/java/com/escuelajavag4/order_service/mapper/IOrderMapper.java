@@ -5,7 +5,7 @@ import com.escuelajavag4.order_service.dto.OrderRequestDto;
 import com.escuelajavag4.order_service.model.Order;
 import org.mapstruct.Mapper;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = { IOrderItemMapper.class })
 public interface IOrderMapper {
 
     Order toEntity(OrderRequestDto dto);

@@ -20,12 +20,12 @@ public class OrderController {
 
     @GetMapping
     public OrderDto findAll() {
-        return orderService.findAll();
+        return orderService.findAllOrders();
     }
 
     @RequestMapping("/{id}")
     public OrderDto findById(@PathVariable Long id) {
-        return orderService.findById(id);
+        return orderService.findOrderById(id);
     }
 
     @PostMapping("/create")

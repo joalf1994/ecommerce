@@ -12,6 +12,8 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
+
 @Entity
 @Table(name = "order_items")
 @Getter
@@ -25,9 +27,9 @@ public class OrderItem {
 
     private Integer qty;
 
-    private Double unitPrice;
+    private BigDecimal unitPrice;
 
-    private Double subtotal;
+    private BigDecimal subtotal;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id")

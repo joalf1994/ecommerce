@@ -11,7 +11,7 @@ import java.util.List;
 @Setter
 @Builder
 public class OrderDto {
-    private Long orderId;
+    private Long id;
     private String status;
     private LocalDateTime createdAt;
     private Double total;

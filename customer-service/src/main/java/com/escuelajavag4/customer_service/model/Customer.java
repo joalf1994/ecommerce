@@ -1,7 +1,11 @@
 package com.escuelajavag4.customer_service.model;
 
-import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import jakarta.persistence.Id;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Column;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -22,7 +26,9 @@ public class Customer {
 
     private String fullName;
 
-    private Level level;
+    private String level;
+
+    private Boolean active;
 
     private LocalDateTime createdAt;
 }

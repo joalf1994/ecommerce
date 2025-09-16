@@ -1,24 +1,25 @@
 package com.escuelajavag4.inventory_service.mapper;
 
-
-import com.escuelajavag4.inventory_service.dto.StockDto;
-import com.escuelajavag4.inventory_service.dto.StockSaveRequestDto;
-import com.escuelajavag4.inventory_service.model.Stock;
+import com.escuelajavag4.inventory_service.model.dto.request.StockCreateRequestDto;
+import com.escuelajavag4.inventory_service.model.dto.request.StockUpdateRequestDto;
+import com.escuelajavag4.inventory_service.model.dto.response.StockResponseDto;
+import com.escuelajavag4.inventory_service.model.entity.Stock;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.factory.Mappers;
+import org.mapstruct.MappingTarget;
 
-import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface StockMapper {
-    StockMapper INSTANCE = Mappers.getMapper(StockMapper.class);
 
-    StockDto toDto(Stock stock);
-    List<StockDto> toDtoList(List<Stock> stocks);
-
-    @Mapping(target = "productId", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
-    Stock toEntity(StockSaveRequestDto stockSaveRequestDto);
+    Stock toEntity(StockCreateRequestDto stockCreateRequestDto);
+
+    @Mapping(target = "stockId", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "updatedAt", ignore = true)
+    void updateEntityFromTo(StockUpdateRequestDto stockUpdateRequestDto, @MappingTarget Stock stock);
+
+    StockResponseDto toResponseDto(Stock stock);
 }

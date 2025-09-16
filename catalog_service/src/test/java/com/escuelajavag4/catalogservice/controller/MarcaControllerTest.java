@@ -9,9 +9,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import java.util.List;
-
 import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -41,9 +41,11 @@ public class MarcaControllerTest {
 
         when(marcaService.createMarca(request)).thenReturn(sampleMarca);
 
-        MarcaResponseDto result = marcaController.createMarca(request);
-        assertNotNull(result);
-        assertEquals("Nike", result.getName());
+        ResponseEntity<MarcaResponseDto> response = marcaController.createMarca(request);
+
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals("Nike", response.getBody().getName());
 
         verify(marcaService).createMarca(request);
     }
@@ -52,9 +54,11 @@ public class MarcaControllerTest {
     void testGetAllMarcas() {
         when(marcaService.getAllMarcas()).thenReturn(List.of(sampleMarca));
 
-        List<MarcaResponseDto> result = marcaController.getAllMarcas();
-        assertNotNull(result);
-        assertEquals(1, result.size());
+        ResponseEntity<List<MarcaResponseDto>> response = marcaController.getAllMarcas();
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals(1, response.getBody().size());
 
         verify(marcaService).getAllMarcas();
     }
@@ -63,9 +67,11 @@ public class MarcaControllerTest {
     void testGetMarcaById() {
         when(marcaService.getMarcaById(1L)).thenReturn(sampleMarca);
 
-        MarcaResponseDto result = marcaController.getMarcaById(1L);
-        assertNotNull(result);
-        assertEquals(1L, result.getId());
+        ResponseEntity<MarcaResponseDto> response = marcaController.getMarcaById(1L);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals(1L, response.getBody().getId());
 
         verify(marcaService).getMarcaById(1L);
     }
@@ -74,9 +80,11 @@ public class MarcaControllerTest {
     void testGetMarcaByName() {
         when(marcaService.getMarcaByName("Nike")).thenReturn(sampleMarca);
 
-        MarcaResponseDto result = marcaController.getMarcaByName("Nike");
-        assertNotNull(result);
-        assertEquals("Nike", result.getName());
+        ResponseEntity<MarcaResponseDto> response = marcaController.getMarcaByName("Nike");
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals("Nike", response.getBody().getName());
 
         verify(marcaService).getMarcaByName("Nike");
     }
@@ -85,9 +93,11 @@ public class MarcaControllerTest {
     void testGetActiveMarcas() {
         when(marcaService.getActiveMarcas()).thenReturn(List.of(sampleMarca));
 
-        List<MarcaResponseDto> result = marcaController.getActiveMarcas();
-        assertNotNull(result);
-        assertTrue(result.get(0).getActive());
+        ResponseEntity<List<MarcaResponseDto>> response = marcaController.getActiveMarcas();
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertTrue(response.getBody().get(0).getActive());
 
         verify(marcaService).getActiveMarcas();
     }
@@ -104,9 +114,11 @@ public class MarcaControllerTest {
 
         when(marcaService.updateMarca(1L, updateRequest)).thenReturn(updatedMarca);
 
-        MarcaResponseDto result = marcaController.updateMarca(1L, updateRequest);
-        assertNotNull(result);
-        assertEquals("Adidas", result.getName());
+        ResponseEntity<MarcaResponseDto> response = marcaController.updateMarca(1L, updateRequest);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals("Adidas", response.getBody().getName());
 
         verify(marcaService).updateMarca(1L, updateRequest);
     }
@@ -115,9 +127,11 @@ public class MarcaControllerTest {
     void testActivateMarca() {
         when(marcaService.activateMarca(1L)).thenReturn(sampleMarca);
 
-        MarcaResponseDto result = marcaController.activateMarca(1L);
-        assertNotNull(result);
-        assertTrue(result.getActive());
+        ResponseEntity<MarcaResponseDto> response = marcaController.activateMarca(1L);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertTrue(response.getBody().getActive());
 
         verify(marcaService).activateMarca(1L);
     }
@@ -126,7 +140,10 @@ public class MarcaControllerTest {
     void testDeactivateMarca() {
         doNothing().when(marcaService).deactivateMarca(1L);
 
-        marcaController.deactivateMarca(1L);
+        ResponseEntity<Void> response = marcaController.deactivateMarca(1L);
+
+        assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
+        assertNull(response.getBody());
 
         verify(marcaService).deactivateMarca(1L);
     }
@@ -135,7 +152,10 @@ public class MarcaControllerTest {
     void testDeleteMarca() {
         doNothing().when(marcaService).deleteMarca(1L);
 
-        marcaController.deleteMarca(1L);
+        ResponseEntity<Void> response = marcaController.deleteMarca(1L);
+
+        assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
+        assertNull(response.getBody());
 
         verify(marcaService).deleteMarca(1L);
     }

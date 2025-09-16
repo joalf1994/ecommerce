@@ -6,6 +6,8 @@ import com.escuelajavag4.catalogservice.model.dto.response.ProductResponseDto;
 import com.escuelajavag4.catalogservice.service.ProductService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,83 +20,87 @@ public class ProductController {
     private final ProductService productService;
 
     @PostMapping
-    public ProductResponseDto createProduct(@Valid @RequestBody ProductCreateRequestDto createRequestDto) {
-        return productService.createProduct(createRequestDto);
+    public ResponseEntity<ProductResponseDto> createProduct(
+            @Valid @RequestBody ProductCreateRequestDto createRequestDto) {
+        ProductResponseDto created = productService.createProduct(createRequestDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
     @GetMapping
-    public List<ProductResponseDto> getAllProducts() {
-        return productService.getAllProducts();
+    public ResponseEntity<List<ProductResponseDto>> getAllProducts() {
+        return ResponseEntity.ok(productService.getAllProducts());
     }
 
     @GetMapping("/{id}")
-    public ProductResponseDto getProductById(@PathVariable Long id) {
-        return productService.getProductById(id);
+    public ResponseEntity<ProductResponseDto> getProductById(@PathVariable Long id) {
+        return ResponseEntity.ok(productService.getProductById(id));
     }
 
     @GetMapping("/search")
-    public List<ProductResponseDto> searchProductsByName(@RequestParam String name) {
-        return productService.searchProductsByName(name);
+    public ResponseEntity<List<ProductResponseDto>> searchProductsByName(@RequestParam String name) {
+        return ResponseEntity.ok(productService.searchProductsByName(name));
     }
 
     @GetMapping("/active")
-    public List<ProductResponseDto> getActiveProducts() {
-        return productService.getActiveProducts();
+    public ResponseEntity<List<ProductResponseDto>> getActiveProducts() {
+        return ResponseEntity.ok(productService.getActiveProducts());
     }
 
     @GetMapping("/category/{categoryId}")
-    public List<ProductResponseDto> getProductsByCategory(@PathVariable Long categoryId) {
-        return productService.getProductsByCategory(categoryId);
+    public ResponseEntity<List<ProductResponseDto>> getProductsByCategory(@PathVariable Long categoryId) {
+        return ResponseEntity.ok(productService.getProductsByCategory(categoryId));
     }
 
     @GetMapping("/category/{categoryId}/active")
-    public List<ProductResponseDto> getActiveProductsByCategory(@PathVariable Long categoryId) {
-        return productService.getActiveProductsByCategory(categoryId);
+    public ResponseEntity<List<ProductResponseDto>> getActiveProductsByCategory(@PathVariable Long categoryId) {
+        return ResponseEntity.ok(productService.getActiveProductsByCategory(categoryId));
     }
 
     @GetMapping("/brand/{marcaId}")
-    public List<ProductResponseDto> getProductsByMarca(@PathVariable Long marcaId) {
-        return productService.getProductsByMarca(marcaId);
+    public ResponseEntity<List<ProductResponseDto>> getProductsByMarca(@PathVariable Long marcaId) {
+        return ResponseEntity.ok(productService.getProductsByMarca(marcaId));
     }
 
     @GetMapping("/brand/{marcaId}/active")
-    public List<ProductResponseDto> getActiveProductsByMarca(@PathVariable Long marcaId) {
-        return productService.getActiveProductsByMarca(marcaId);
+    public ResponseEntity<List<ProductResponseDto>> getActiveProductsByMarca(@PathVariable Long marcaId) {
+        return ResponseEntity.ok(productService.getActiveProductsByMarca(marcaId));
     }
 
     @GetMapping("/category/{categoryId}/brand/{marcaId}")
-    public List<ProductResponseDto> getProductsByCategoryAndMarca(
+    public ResponseEntity<List<ProductResponseDto>> getProductsByCategoryAndMarca(
             @PathVariable Long categoryId,
             @PathVariable Long marcaId) {
-        return productService.getProductsByCategoryAndMarca(categoryId, marcaId);
+        return ResponseEntity.ok(productService.getProductsByCategoryAndMarca(categoryId, marcaId));
     }
 
     @GetMapping("/category/{categoryId}/brand/{marcaId}/active")
-    public List<ProductResponseDto> getActiveProductsByCategoryAndMarca(
+    public ResponseEntity<List<ProductResponseDto>> getActiveProductsByCategoryAndMarca(
             @PathVariable Long categoryId,
             @PathVariable Long marcaId) {
-        return productService.getActiveProductsByCategoryAndMarca(categoryId, marcaId);
+        return ResponseEntity.ok(productService.getActiveProductsByCategoryAndMarca(categoryId, marcaId));
     }
 
     @PutMapping("/{id}")
-    public ProductResponseDto updateProduct(
+    public ResponseEntity<ProductResponseDto> updateProduct(
             @PathVariable Long id,
             @Valid @RequestBody ProductUpdateRequestDto updateRequestDto) {
-        return productService.updateProduct(id, updateRequestDto);
+        return ResponseEntity.ok(productService.updateProduct(id, updateRequestDto));
     }
 
     @PatchMapping("/{id}/activate")
-    public ProductResponseDto activateProduct(@PathVariable Long id) {
-        return productService.activateProduct(id);
+    public ResponseEntity<ProductResponseDto> activateProduct(@PathVariable Long id) {
+        return ResponseEntity.ok(productService.activateProduct(id));
     }
 
     @PatchMapping("/{id}/deactivate")
-    public void deactivateProduct(@PathVariable Long id) {
+    public ResponseEntity<Void> deactivateProduct(@PathVariable Long id) {
         productService.deactivateProduct(id);
+        return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/{id}")
-    public void deleteProduct(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
         productService.deleteProduct(id);
+        return ResponseEntity.noContent().build();
     }
 }

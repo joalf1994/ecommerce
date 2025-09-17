@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 @FeignClient(name = "inventory-service")
 public interface InventoryClient {
     @GetMapping("/inventory/reservations/{productId}")
-    StockDto getStockByProductId(@PathVariable Long productId);
+    Boolean hasSufficientStock(@PathVariable("productId") Long productId, @RequestParam("cantidad") int cantidad);
 
     @PutMapping("/inventory/reservations/{productId}/reserve")
     StockReservedDto reserveStock(@PathVariable Long productId, @RequestParam int cantidad);

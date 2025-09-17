@@ -9,6 +9,7 @@ import com.escuelajavag4.order_service.dto.inventory.StockDto;
 import com.escuelajavag4.order_service.dto.inventory.StockReservedDto;
 import com.escuelajavag4.order_service.dto.product.ProductDto;
 import com.escuelajavag4.order_service.exception.CustomerNotFoundException;
+import com.escuelajavag4.order_service.exception.OrderNotFoundException;
 import com.escuelajavag4.order_service.exception.ProductNotFoundException;
 import com.escuelajavag4.order_service.exception.StockInsufficientException;
 import com.escuelajavag4.order_service.feign.CatalogClient;
@@ -21,6 +22,7 @@ import com.escuelajavag4.order_service.model.Order;
 import com.escuelajavag4.order_service.model.OrderItem;
 import com.escuelajavag4.order_service.model.PaymentMethod;
 import com.escuelajavag4.order_service.repository.IOrderRepository;
+import com.escuelajavag4.order_service.service.IOrderItemService;
 import com.escuelajavag4.order_service.service.IOrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -36,6 +38,7 @@ public class OrderServiceImpl implements IOrderService {
     private final IOrderRepository orderRepository;
     private final IOrderMapper orderMapper;
     private final IOrderItemMapper orderItemMapper;
+    private final IOrderItemService orderItemService;
 
     private final CustomerClient customerClient;
     private final CatalogClient catalogClient;
@@ -73,7 +76,15 @@ public class OrderServiceImpl implements IOrderService {
 
     @Override
     public OrderDto findOrderById(Long id) {
-        return null;
+
+        Order order = orderRepository.findById(id)
+                .orElseThrow(() -> new OrderNotFoundException("Order with id " + id + " not found"));
+        OrderDto orderDto = orderMapper.toDto(order);
+
+        List<OrderItemDto> orderItemDtos = orderItemService.orderItemsByProductId(id);
+        orderDto.setItems(orderItemDtos);
+
+        return orderDto;
     }
 
     @Override
@@ -92,16 +103,18 @@ public class OrderServiceImpl implements IOrderService {
         List<OrderItem> items = request.getItems().stream()
                 .map(dto ->  {
                     ProductDto product = catalogClient.getProductById(dto.getProductId());
-                    StockDto stock = inventoryClient.getStockByProductId(dto.getProductId());
 
                     // reservamos stock, actualizamos el service inventory
-                    StockReservedDto ddd = inventoryClient.reserveStock(dto.getProductId(), dto.getQty());
+                    StockReservedDto StockReserved = inventoryClient.reserveStock(dto.getProductId(), dto.getQty());
 
                     //creamos el item
                     OrderItem item = orderItemMapper.toEntity(dto, order);
                     item.setUnitPrice(product.getPrice());
                     BigDecimal subTotal = product.getPrice().multiply(BigDecimal.valueOf(dto.getQty()));
                     item.setSubtotal(subTotal);
+                    //guarmanos orderItem
+                    orderItemService.createOrderItem(item);
+
                     return item;
                 })
                 .toList();
@@ -135,37 +148,19 @@ public class OrderServiceImpl implements IOrderService {
             //Producto no existe → lanzar excepción (ProductNotFoundException) y rechazar la orden.
             //Producto existe pero está inactivo (ej. descontinuado) → no se puede vender → rechazar.
             if (product == null || !product.getActive()) {
-                throw new ProductNotFoundException("Producto " + item.getProductId() + " no disponible");
+                throw new ProductNotFoundException("Product " + item.getProductId() + " not available");
             }
-            StockDto stock = inventoryClient.getStockByProductId(item.getProductId());
+            ;
 //            Consulta el servicio de inventory para obtener los detalles de stock de un producto
 //            verifica si la cantidad deseada está disponible.
 //            Lanza una excepción en tiempo de ejecución si no hay stock suficiente.
-            if (stock.getAvailable() < item.getQty()) {
-                throw new StockInsufficientException("Stock insuficiente para producto " + item.getProductId());
+            boolean disponible = inventoryClient.hasSufficientStock(item.getProductId(), item.getQty());
+            if (!disponible) {
+                throw new StockInsufficientException("No hay suficiente stock para el producto " + item.getProductId());
             }
         }
     }
-
 }
-
-
-//
-//{
-//        "status": "ERROR",
-//        "message": "Producto con ID p20 no encontrado",
-//        "invalidProductId": "p20"
-//        }
-//        📌 Ejemplo si pasa la validación:
-
-//json
-//Copiar código
-//{
-//        "orderId": "o789",
-//        "status": "CONFIRMED",
-//        "totalAmount": 120.50
-//        }
-
 
 
 

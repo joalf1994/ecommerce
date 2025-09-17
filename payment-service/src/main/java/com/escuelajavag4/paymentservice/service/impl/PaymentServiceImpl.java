@@ -9,6 +9,7 @@ import com.escuelajavag4.paymentservice.model.dto.PaymentCreateRequestDto;
 import com.escuelajavag4.paymentservice.model.dto.PaymentResponseDto;
 import com.escuelajavag4.paymentservice.model.dto.PaymentUpdateRequestDto;
 import com.escuelajavag4.paymentservice.model.entity.Payment;
+import com.escuelajavag4.paymentservice.model.entity.PaymentStatus;
 import com.escuelajavag4.paymentservice.repository.PaymentRepository;
 import com.escuelajavag4.paymentservice.service.PaymentService;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +28,6 @@ public class PaymentServiceImpl implements PaymentService {
     private final PaymentRepository paymentRepository;
     private final PaymentMapper paymentMapper;
     private final PaymentEventProducer paymentEventProducer;
-
     @Override
     public PaymentResponseDto create(PaymentCreateRequestDto dto) {
         paymentRepository.findByOrderId(dto.getOrderId())
@@ -44,8 +44,11 @@ public class PaymentServiceImpl implements PaymentService {
             throw new IllegalArgumentException("El monto no puede ser negativo");
         }
 
+
         Payment payment = paymentMapper.toEntity(dto);
+        payment.setStatus(PaymentStatus.COMPLETED);
         Payment saved = paymentRepository.save(payment);
+
 
         PaymentCompletedEvent  event = new PaymentCompletedEvent();
         event.setOrderId(saved.getOrderId());
@@ -56,6 +59,7 @@ public class PaymentServiceImpl implements PaymentService {
 
         return paymentMapper.toResponseDto(saved);
     }
+
 
 
     @Override

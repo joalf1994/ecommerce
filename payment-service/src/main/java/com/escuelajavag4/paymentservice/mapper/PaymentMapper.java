@@ -10,20 +10,18 @@ import org.mapstruct.*;
 @Mapper(componentModel = "spring")
 public interface PaymentMapper {
 
-    // ================== CREATE ==================
     @Mapping(target = "paymentId", ignore = true)
-    @Mapping(target = "status", constant = "PENDING")
+    @Mapping(target = "status", ignore = false)
     @Mapping(target = "createdAt", ignore = true)
     Payment toEntity(PaymentCreateRequestDto dto);
 
-    // ================== UPDATE ==================
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "paymentId", ignore = true)
     @Mapping(target = "orderId", ignore = true)
     @Mapping(target = "amount", ignore = true)
+    @Mapping(target = "status", ignore = false)
     @Mapping(target = "createdAt", ignore = true)
     void updateEntityFromDto(PaymentUpdateRequestDto dto, @MappingTarget Payment entity);
 
-    // ================== RESPONSE ==================
     PaymentResponseDto toResponseDto(Payment entity);
 }

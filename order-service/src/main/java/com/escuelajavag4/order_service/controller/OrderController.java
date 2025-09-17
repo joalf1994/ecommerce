@@ -18,12 +18,7 @@ public class OrderController {
 
     private final IOrderService orderService;
 
-    @GetMapping
-    public OrderDto findAll() {
-        return orderService.findAllOrders();
-    }
-
-    @RequestMapping("/{id}")
+    @GetMapping("/{id}")
     public OrderDto findById(@PathVariable Long id) {
         return orderService.findOrderById(id);
     }

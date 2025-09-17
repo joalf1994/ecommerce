@@ -54,15 +54,16 @@ class StockControllerTest {
         dto.setCreatedAt(new Date());
         dto.setUpdatedAt(new Date());
 
-        Mockito.when(stockService.getStockById(100L)).thenReturn(dto);
+        Mockito.when(stockService.getStockById(100L)).thenReturn(List.of(dto));
 
         mockMvc.perform(get("/inventory/reservations/{productId}", 100L))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.stockId").value(1L))
-                .andExpect(jsonPath("$.productId").value(100L))
-                .andExpect(jsonPath("$.warehouseId").value(200L))
-                .andExpect(jsonPath("$.available").value(10))
-                .andExpect(jsonPath("$.reserved").value(0));
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$[0].stockId").value(1L))
+                .andExpect(jsonPath("$[0].productId").value(100L))
+                .andExpect(jsonPath("$[0].warehouseId").value(200L))
+                .andExpect(jsonPath("$[0].available").value(10))
+                .andExpect(jsonPath("$[0].reserved").value(0));
     }
 
     @Test
@@ -134,5 +135,25 @@ class StockControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("RESERVED"))
                 .andExpect(jsonPath("$.reservationId").value("abc-123"));
+    }
+
+    @Test
+    void testValidateStock_true() throws Exception {
+        Mockito.when(stockService.validateStock(100L, 5)).thenReturn(true);
+
+        mockMvc.perform(get("/inventory/reservations/{productId}/validate", 100L)
+                        .param("cantidad", "5"))
+                .andExpect(status().isOk())
+                .andExpect(content().string("true"));
+    }
+
+    @Test
+    void testValidateStock_false() throws Exception {
+        Mockito.when(stockService.validateStock(200L, 10)).thenReturn(false);
+
+        mockMvc.perform(get("/inventory/reservations/{productId}/validate", 200L)
+                        .param("cantidad", "10"))
+                .andExpect(status().isOk())
+                .andExpect(content().string("false"));
     }
 }

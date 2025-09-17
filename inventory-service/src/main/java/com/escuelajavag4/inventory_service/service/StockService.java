@@ -8,7 +8,8 @@ import java.util.List;
 
 public interface StockService {
     List<StockResponseDto> getListStock();
-    StockResponseDto getStockById(Long productId);
+    List<StockResponseDto> getStockById(Long productId);
     StockResponseDto saveStock(StockCreateRequestDto stockCreateRequestDto);
     StockReservedResponseDto reserveStock(Long productId, int cantidad);
+    boolean validateStock(Long productId, int cantidad);
 }

@@ -87,18 +87,17 @@ public class OrderServiceImpl implements IOrderService {
 
         order.setItems(items);
 
-        BigDecimal total = items.stream()
+        BigDecimal amount = items.stream()
                         .map(OrderItem::getSubtotal)
                         .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        order.setTotal(total.doubleValue());
+        order.setTotal(amount.doubleValue());
 
         Order savedOrder = orderRepository.save(order);
 
-        OrderCompletedEventDto orderCompletedEventDto = OrderCompletedEventDto.builder()
-                .orderId(order.getId())
-                .total(total)
-                .build();
+        OrderCompletedEventDto orderCompletedEventDto = new OrderCompletedEventDto();
+                orderCompletedEventDto.setOrderId(order.getId());
+                orderCompletedEventDto.setAmount(amount);
 
         orderEventProducer.emisorCompletedEvent(orderCompletedEventDto);
 

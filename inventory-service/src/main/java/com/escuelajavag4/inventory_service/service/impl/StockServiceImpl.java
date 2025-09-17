@@ -33,8 +33,9 @@ public class StockServiceImpl implements StockService {
     }
 
     @Override
-    public StockResponseDto getStockById(Long productId) {
-        return stockMapper.toResponseDto(stockRepository.findByProductId(productId));
+    public List<StockResponseDto> getStockById(Long productId) {
+        List<Stock> stockList  = stockRepository.findAllByProductId(productId).stream().toList();
+        return stockMapper.toResponseListDto(stockList);
     }
 
     @Override
@@ -93,5 +94,22 @@ public class StockServiceImpl implements StockService {
         stockReservedResponseDto.setExpiresAt(LocalDateTime.now().plusDays(2));
 
         return stockReservedResponseDto;
+    }
+
+    @Override
+    public boolean validateStock(Long productId, int cantidad) {
+        if (cantidad <= 0) {
+            throw new IllegalArgumentException("La cantidad a validar debe ser mayor a 0");
+        }
+        List<Stock> stockList = stockRepository.findAllByProductId(productId).stream().toList();
+
+        if (stockList.isEmpty()) {
+            return false;
+        }
+
+        int totalDisponible = stockList.stream()
+                .mapToInt(Stock::getAvailable)
+                .sum();
+        return totalDisponible >= cantidad;
     }
 }

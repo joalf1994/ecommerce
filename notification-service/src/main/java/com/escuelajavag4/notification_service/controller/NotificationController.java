@@ -4,6 +4,7 @@ import com.escuelajavag4.notification_service.model.dto.request.OrderConfirmedEv
 import com.escuelajavag4.notification_service.model.dto.response.NotificationDto;
 import com.escuelajavag4.notification_service.service.impl.NotificationServiceImpl;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,8 +17,8 @@ public class NotificationController {
 
 
     @GetMapping("/{orderId}")
-    public NotificationDto getNotificationByOrderId(@PathVariable String orderId) {
-        return notificationServiceImpl.getNotificationByOrderId(orderId);
+    public ResponseEntity<NotificationDto> getNotificationByOrderId(@PathVariable String orderId) {
+        return ResponseEntity.ok(notificationServiceImpl.getNotificationByOrderId(orderId));
     }
 
     @PostMapping

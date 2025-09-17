@@ -22,7 +22,7 @@ public class StockController {
     }
 
     @GetMapping("/{productId}")
-    public StockResponseDto getStockById(@PathVariable Long productId) {
+    public List<StockResponseDto> getStockById(@PathVariable Long productId) {
         return stockService.getStockById(productId);
     }
 
@@ -37,6 +37,12 @@ public class StockController {
             @RequestParam int cantidad
     ) {
         return  stockService.reserveStock(productId, cantidad);
+    }
+
+    @GetMapping("/{productId}/validate")
+    public boolean validateStock( @PathVariable Long productId,
+                                  @RequestParam int cantidad){
+        return stockService.validateStock(productId, cantidad);
     }
 
 }

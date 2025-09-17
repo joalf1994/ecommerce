@@ -1,15 +1,17 @@
 package com.escuelajavag4.order_service.dto.kafka;
 
-import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 
 @Getter
 @Setter
-@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class OrderCompletedEventDto {
     private Long orderId;
-    private BigDecimal total;
+    private BigDecimal amount;
 }

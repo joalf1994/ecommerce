@@ -1,6 +1,9 @@
 package com.escuelajavag4.order_service.dto.kafka;
 
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 

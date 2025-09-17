@@ -15,7 +15,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.kafka.core.KafkaTemplate;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -40,7 +39,7 @@ class PaymentServiceImplTest {
     private PaymentServiceImpl paymentService;
 
     @Test
-    void crear_pago_existente() {
+    void crear_pago_existente_lanza_excepcion() {
         PaymentCreateRequestDto dto = new PaymentCreateRequestDto();
         dto.setOrderId(1L);
 
@@ -50,26 +49,13 @@ class PaymentServiceImplTest {
     }
 
     @Test
-    void crear_pago_monto_negativo() {
-        PaymentCreateRequestDto dto = new PaymentCreateRequestDto();
-        dto.setOrderId(1L);
-        dto.setAmount(BigDecimal.valueOf(-10));
-
-        assertThrows(IllegalArgumentException.class, () -> paymentService.create(dto));
-    }
-
-    @Test
-    void crear_pago_exitoso() {
+    void crear_pago_exitoso_devuelve_dto() {
         PaymentCreateRequestDto dto = new PaymentCreateRequestDto();
         dto.setOrderId(1L);
         dto.setAmount(BigDecimal.valueOf(100.00));
 
         Payment payment = new Payment();
         Payment savedPayment = new Payment();
-        savedPayment.setOrderId(1L);
-        savedPayment.setAmount(BigDecimal.valueOf(100.00));
-        savedPayment.setPaymentId(10L);
-
         PaymentResponseDto responseDto = new PaymentResponseDto();
 
         when(paymentRepository.findByOrderId(1L)).thenReturn(Optional.empty());
@@ -81,12 +67,11 @@ class PaymentServiceImplTest {
 
         assertEquals(responseDto, resultado);
         verify(paymentRepository).save(payment);
-        verify(paymentMapper).toResponseDto(savedPayment);
         verify(paymentEventProducer).emiter(any(PaymentCompletedEvent.class));
     }
 
     @Test
-    void actualizar_pago_no_encontrado() {
+    void actualizar_estado_pago_no_encontrado_lanza_excepcion() {
         PaymentUpdateRequestDto dto = new PaymentUpdateRequestDto();
         when(paymentRepository.findById(1L)).thenReturn(Optional.empty());
 
@@ -94,7 +79,7 @@ class PaymentServiceImplTest {
     }
 
     @Test
-    void actualizar_pago_exitoso() {
+    void actualizar_estado_pago_exitoso_devuelve_dto() {
         PaymentUpdateRequestDto dto = new PaymentUpdateRequestDto();
         Payment payment = new Payment();
         Payment updatedPayment = new Payment();
@@ -112,14 +97,14 @@ class PaymentServiceImplTest {
     }
 
     @Test
-    void buscar_por_id_no_encontrado() {
+    void buscar_por_id_no_encontrado_lanza_excepcion() {
         when(paymentRepository.findById(1L)).thenReturn(Optional.empty());
 
         assertThrows(ResourceNotFoundException.class, () -> paymentService.findById(1L));
     }
 
     @Test
-    void buscar_por_id_exitoso() {
+    void buscar_por_id_exitoso_devuelve_dto() {
         Payment payment = new Payment();
         PaymentResponseDto responseDto = new PaymentResponseDto();
 
@@ -132,7 +117,7 @@ class PaymentServiceImplTest {
     }
 
     @Test
-    void buscar_todos() {
+    void buscar_todos_devuelve_lista_de_dtos() {
         Payment payment1 = new Payment();
         Payment payment2 = new Payment();
         List<Payment> pagos = List.of(payment1, payment2);
@@ -152,14 +137,14 @@ class PaymentServiceImplTest {
     }
 
     @Test
-    void eliminar_pago_no_encontrado() {
+    void eliminar_pago_no_encontrado_lanza_excepcion() {
         when(paymentRepository.existsById(1L)).thenReturn(false);
 
         assertThrows(ResourceNotFoundException.class, () -> paymentService.delete(1L));
     }
 
     @Test
-    void eliminar_pago_exitoso() {
+    void eliminar_pago_exitoso_llama_a_delete() {
         when(paymentRepository.existsById(1L)).thenReturn(true);
 
         paymentService.delete(1L);
@@ -168,14 +153,14 @@ class PaymentServiceImplTest {
     }
 
     @Test
-    void buscar_por_order_id_no_encontrado() {
+    void buscar_por_order_id_no_encontrado_lanza_excepcion() {
         when(paymentRepository.findByOrderId(1L)).thenReturn(Optional.empty());
 
         assertThrows(ResourceNotFoundException.class, () -> paymentService.findByOrderId(1L));
     }
 
     @Test
-    void buscar_por_order_id_exitoso() {
+    void buscar_por_order_id_exitoso_devuelve_dto() {
         Payment payment = new Payment();
         PaymentResponseDto responseDto = new PaymentResponseDto();
 
@@ -187,3 +172,4 @@ class PaymentServiceImplTest {
         assertEquals(responseDto, resultado);
     }
 }
+

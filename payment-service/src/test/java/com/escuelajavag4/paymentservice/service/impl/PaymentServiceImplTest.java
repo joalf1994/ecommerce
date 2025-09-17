@@ -3,6 +3,8 @@ package com.escuelajavag4.paymentservice.service.impl;
 import com.escuelajavag4.paymentservice.exception.DuplicateResourceException;
 import com.escuelajavag4.paymentservice.exception.ResourceNotFoundException;
 import com.escuelajavag4.paymentservice.mapper.PaymentMapper;
+import com.escuelajavag4.paymentservice.messaging.PaymentEventProducer;
+import com.escuelajavag4.paymentservice.model.dto.PaymentCompletedEvent;
 import com.escuelajavag4.paymentservice.model.dto.PaymentCreateRequestDto;
 import com.escuelajavag4.paymentservice.model.dto.PaymentResponseDto;
 import com.escuelajavag4.paymentservice.model.dto.PaymentUpdateRequestDto;
@@ -13,7 +15,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.kafka.core.KafkaTemplate;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -32,7 +33,7 @@ class PaymentServiceImplTest {
     private PaymentMapper paymentMapper;
 
     @Mock
-    private KafkaTemplate<String, Object> kafkaTemplate;
+    private PaymentEventProducer paymentEventProducer;
 
     @InjectMocks
     private PaymentServiceImpl paymentService;
@@ -60,15 +61,14 @@ class PaymentServiceImplTest {
         when(paymentRepository.findByOrderId(1L)).thenReturn(Optional.empty());
         when(paymentMapper.toEntity(dto)).thenReturn(payment);
         when(paymentRepository.save(payment)).thenReturn(savedPayment);
-        when(kafkaTemplate.send(anyString(), any())).thenReturn(null);
         when(paymentMapper.toResponseDto(savedPayment)).thenReturn(responseDto);
 
         PaymentResponseDto resultado = paymentService.create(dto);
 
         assertEquals(responseDto, resultado);
         verify(paymentRepository).save(payment);
+        verify(paymentEventProducer).emiter(any(PaymentCompletedEvent.class));
     }
-
 
     @Test
     void actualizar_estado_pago_no_encontrado_lanza_excepcion() {
@@ -172,3 +172,4 @@ class PaymentServiceImplTest {
         assertEquals(responseDto, resultado);
     }
 }
+

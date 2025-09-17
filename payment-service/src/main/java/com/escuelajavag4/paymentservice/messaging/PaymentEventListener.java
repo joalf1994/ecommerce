@@ -13,7 +13,7 @@ public class PaymentEventListener {
     private final PaymentService paymentService;
 
     @KafkaListener(topics = "order-created", groupId = "payment-service")
-    public void onOrderCreated(OrderCreatedEvent event) {
+    public void onOrderCreated(OrderCompletedEventDto event) {
         PaymentCreateRequestDto dto = new PaymentCreateRequestDto();
         dto.setOrderId(event.getOrderId());
         dto.setAmount(event.getAmount());
@@ -22,3 +22,4 @@ public class PaymentEventListener {
     }
 
 }
+

@@ -42,7 +42,7 @@ public class NotificationServiceImpl implements INotificationService {
 
     @Override
     public NotificationDto getNotificationByOrderId(String orderId) {
-        return notificationRepository.findByOrderId(orderId)
+        return notificationRepository.findFirstByOrderIdOrderBySentAtDesc(orderId)
                 .map(notificationMapper::toDto)
                 .orElseThrow(() -> new RuntimeException("Notificación no encontrada"));
     }

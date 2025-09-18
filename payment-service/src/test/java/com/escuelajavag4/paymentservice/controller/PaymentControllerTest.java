@@ -1,5 +1,6 @@
 package com.escuelajavag4.paymentservice.controller;
 
+import com.escuelajavag4.paymentservice.model.dto.OrderCompletedEventDto;
 import com.escuelajavag4.paymentservice.model.dto.PaymentCreateRequestDto;
 import com.escuelajavag4.paymentservice.model.dto.PaymentResponseDto;
 import com.escuelajavag4.paymentservice.model.dto.PaymentUpdateRequestDto;
@@ -18,7 +19,6 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.*;
-
 @ExtendWith(MockitoExtension.class)
 class PaymentControllerTest {
 
@@ -38,15 +38,27 @@ class PaymentControllerTest {
     }
 
     @Test
-    void crear_pago_llama_servicio_y_devuelve_dto() {
-        PaymentCreateRequestDto dto = new PaymentCreateRequestDto();
-        when(paymentService.create(dto)).thenReturn(paymentDto);
+    void crear_deuda_llama_servicio_y_devuelve_dto() {
+        OrderCompletedEventDto dto = new OrderCompletedEventDto();
+        when(paymentService.createDeuda(dto)).thenReturn(paymentDto);
 
         ResponseEntity<PaymentResponseDto> response = paymentController.create(dto);
 
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertEquals(paymentDto, response.getBody());
-        verify(paymentService).create(dto);
+        verify(paymentService).createDeuda(dto);
+    }
+
+    @Test
+    void procesar_pago_llama_servicio_y_devuelve_dto() {
+        PaymentCreateRequestDto dto = new PaymentCreateRequestDto();
+        when(paymentService.processPayment(1L, dto)).thenReturn(paymentDto);
+
+        ResponseEntity<PaymentResponseDto> response = paymentController.processPayment(1L, dto);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(paymentDto, response.getBody());
+        verify(paymentService).processPayment(1L, dto);
     }
 
     @Test
@@ -61,7 +73,6 @@ class PaymentControllerTest {
         verify(paymentService).updateStatus(1L, dto);
     }
 
-
     @Test
     void buscar_por_id_llama_servicio_y_devuelve_dto() {
         when(paymentService.findById(1L)).thenReturn(paymentDto);
@@ -72,7 +83,6 @@ class PaymentControllerTest {
         assertEquals(paymentDto, response.getBody());
         verify(paymentService).findById(1L);
     }
-
 
     @Test
     void buscar_por_order_id_llama_servicio_y_devuelve_dto() {
@@ -85,7 +95,6 @@ class PaymentControllerTest {
         verify(paymentService).findByOrderId(1L);
     }
 
-
     @Test
     void buscar_todos_llama_servicio_y_devuelve_lista() {
         when(paymentService.findAll()).thenReturn(listaPagos);
@@ -97,7 +106,6 @@ class PaymentControllerTest {
         verify(paymentService).findAll();
     }
 
-    // ================== ELIMINAR ==================
     @Test
     void eliminar_llama_servicio_y_devuelve_no_content() {
         doNothing().when(paymentService).delete(1L);

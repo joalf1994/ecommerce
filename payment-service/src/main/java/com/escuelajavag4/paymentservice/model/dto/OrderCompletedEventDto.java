@@ -1,14 +1,12 @@
-package com.escuelajavag4.order_service.dto.kafka;
+package com.escuelajavag4.paymentservice.model.dto;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.math.BigDecimal;
 
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class OrderCompletedEventDto {

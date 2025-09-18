@@ -1,7 +1,21 @@
 package com.escuelajavag4.notification_service.template;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
+
 public class EmailTemplates {
-    public static String reservaConfirmada(){
+    public static String reservaConfirmada(BigDecimal amount, String status) {
+
+        LocalDateTime now = LocalDateTime.now();
+
+        DateTimeFormatter formatterFecha = DateTimeFormatter.ofPattern("d 'de' MMMM yyyy", Locale.forLanguageTag("es-PE"));
+        DateTimeFormatter formatterHora = DateTimeFormatter.ofPattern("HH:mm");
+
+        String fechaFormateada = now.format(formatterFecha);
+        String horaFormateada = now.format(formatterHora);
+
         return """
                 <!DOCTYPE html>
                 <html lang="es">
@@ -20,41 +34,41 @@ public class EmailTemplates {
                       max-width: 600px;
                       margin: 20px auto;
                       background-color: #ffffff;
-                      padding: 20px;
-                      border-radius: 8px;
-                      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+                      border-radius: 10px;
+                      overflow: hidden;
+                      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
                     }
                     .header {
+                      background-color: #4CAF50;
+                      color: #ffffff;
                       text-align: center;
-                      padding-bottom: 20px;
-                      border-bottom: 1px solid #eeeeee;
+                      padding: 20px;
                     }
                     .header h1 {
                       margin: 0;
-                      color: #4CAF50;
+                      font-size: 22px;
                     }
                     .content {
-                      padding: 20px 0;
-                      line-height: 1.6;
+                      padding: 25px;
                       color: #333333;
+                      line-height: 1.6;
+                      font-size: 15px;
                     }
-                    .content p {
-                      margin: 10px 0;
+                    .details {
+                      background-color: #f9f9f9;
+                      padding: 15px;
+                      border-radius: 8px;
+                      margin: 20px 0;
                     }
-                    .button {
-                      display: inline-block;
-                      padding: 12px 20px;
-                      margin-top: 20px;
-                      background-color: #4CAF50;
-                      color: #ffffff !important;
-                      text-decoration: none;
-                      border-radius: 5px;
+                    .details p {
+                      margin: 8px 0;
                     }
                     .footer {
+                      background-color: #fafafa;
                       text-align: center;
                       font-size: 12px;
                       color: #888888;
-                      padding-top: 20px;
+                      padding: 15px;
                       border-top: 1px solid #eeeeee;
                     }
                   </style>
@@ -62,24 +76,25 @@ public class EmailTemplates {
                 <body>
                   <div class="container">
                     <div class="header">
-                      <h1>Reserva Confirmada</h1>
+                      <h1>✅ Pedido Confirmado</h1>
                     </div>
                     <div class="content">
-                      <p>Hola <strong>Juan Pérez</strong>,</p>
-                      <p>¡Tu reserva ha sido confirmada con éxito! A continuación, los detalles de tu reserva:</p>
-                      <p><strong>Fecha:</strong> 20 de septiembre, 2025</p>
-                      <p><strong>Hora:</strong> 18:30</p>
-                      <p><strong>Servicio:</strong> Cena para 2 personas</p>
-                      <p><strong>Ubicación:</strong> Restaurante El Buen Sabor</p>
-                      <p>Si necesitas modificar o cancelar tu reserva, haz clic en el siguiente botón:</p>
-                      <a href="https://tuservidor.com/reservas" class="button">Administrar Reserva</a>
+                      <p>¡Tu pedido ha sido confirmado con éxito!</p>
+                      <div class="details">
+                        <p><strong>📅 Fecha:</strong> %s</p>
+                        <p><strong>🕒 Hora:</strong> %s</p>
+                        <p><strong>💵 Monto:</strong> %s</p>
+                        <p><strong>📦 Estado:</strong> %s</p>
+                      </div>
+                      <p>Tu pedido está listo para recoger en tienda.</p>
+                      <p>Gracias por tu compra 💚</p>
                     </div>
                     <div class="footer">
-                      <p>Gracias por elegirnos. Si tienes alguna pregunta, contáctanos en contacto@tuservidor.com</p>
+                      <p>Si tienes alguna pregunta, contáctanos en <a href="mailto:contacto@tuservidor.com">contacto@tuservidor.com</a></p>
                     </div>
                   </div>
                 </body>
                 </html>
-                """;
+                """.formatted(fechaFormateada, horaFormateada, amount, status);
     }
 }

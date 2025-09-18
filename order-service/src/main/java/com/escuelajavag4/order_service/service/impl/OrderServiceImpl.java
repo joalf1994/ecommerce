@@ -61,6 +61,8 @@ public class OrderServiceImpl implements IOrderService {
     public OrderDto createOrder(OrderRequestDto request) {
 
         validateCustomer(request.getCustomerId());
+        String email = customerClient.getCustomerById(request.getCustomerId()).getEmail();
+
 
         Order order = orderMapper.toEntity(request);
         order.setStatus("CREATED");
@@ -98,6 +100,7 @@ public class OrderServiceImpl implements IOrderService {
         OrderCompletedEventDto orderCompletedEventDto = new OrderCompletedEventDto();
                 orderCompletedEventDto.setOrderId(order.getId());
                 orderCompletedEventDto.setAmount(amount);
+                orderCompletedEventDto.setEmail(email);
 
         orderEventProducer.emisorCompletedEvent(orderCompletedEventDto);
 

@@ -35,5 +35,5 @@ public class Payment {
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
-    
+
 }

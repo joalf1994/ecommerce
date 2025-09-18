@@ -2,8 +2,6 @@ package com.escuelajavag4.order_service.controller;
 
 import com.escuelajavag4.order_service.dto.OrderItemDto;
 import com.escuelajavag4.order_service.dto.OrderItemRequestDto;
-import com.escuelajavag4.order_service.exception.OrderItemNotFoundException;
-import com.escuelajavag4.order_service.model.OrderItem;
 import com.escuelajavag4.order_service.service.IOrderItemService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

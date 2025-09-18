@@ -12,4 +12,5 @@ import java.math.BigDecimal;
 public class OrderCompletedEventDto {
     private Long orderId;
     private BigDecimal amount;
+    private String email;
 }

@@ -15,5 +15,6 @@ public class PaymentCompletedEvent {
     private Long paymentId;
     private Long orderId;
     private BigDecimal amount;
+    private String status;
 }
 

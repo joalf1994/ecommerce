@@ -21,7 +21,7 @@ public class NotificationEntity {
     private Long id;
 
     @Column
-    private String orderId;
+    private Long orderId;
 
     @Column
     private String status; // Ej: SENT

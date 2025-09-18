@@ -94,15 +94,18 @@ public class StockServiceImplTest {
 
     @Test
     void getStockById_ok() {
-        when(stockRepository.findByProductId(100L)).thenReturn(stock);
-        when(stockMapper.toResponseDto(stock)).thenReturn(stockDto);
+        when(stockRepository.findAllByProductId(100L)).thenReturn(List.of(stock));
+        when(stockMapper.toResponseListDto(List.of(stock))).thenReturn(List.of(stockDto));
 
-        StockResponseDto result = stockService.getStockById(100L);
+        List<StockResponseDto> result = stockService.getStockById(100L);
 
         assertNotNull(result);
-        assertEquals(100L, result.getProductId());
-        verify(stockRepository).findByProductId(100L);
+        assertEquals(1, result.size());
+        assertEquals(100L, result.getFirst().getProductId());
+        verify(stockRepository).findAllByProductId(100L);
     }
+
+
 
     @Test
     void reserveStock_ok() {
@@ -188,4 +191,38 @@ public class StockServiceImplTest {
     }
 
 
+    @Test
+    void validateStock_ok_true() {
+        stock.setAvailable(10);
+        when(stockRepository.findAllByProductId(100L)).thenReturn(List.of(stock));
+
+        boolean result = stockService.validateStock(100L, 5);
+
+        assertTrue(result);
+        verify(stockRepository).findAllByProductId(100L);
+    }
+
+    @Test
+    void validateStock_ok_false() {
+        stock.setAvailable(3);
+        when(stockRepository.findAllByProductId(100L)).thenReturn(List.of(stock));
+
+        boolean result = stockService.validateStock(100L, 5);
+
+        assertFalse(result);
+    }
+
+    @Test
+    void validateStock_listaVacia() {
+        when(stockRepository.findAllByProductId(100L)).thenReturn(List.of());
+
+        boolean result = stockService.validateStock(100L, 5);
+
+        assertFalse(result);
+    }
+
+    @Test
+    void validateStock_cantidadInvalida() {
+        assertThrows(IllegalArgumentException.class, () -> stockService.validateStock(100L, 0));
+    }
 }

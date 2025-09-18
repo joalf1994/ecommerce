@@ -132,6 +132,7 @@ services:
     ports:
       - "8084:8080"
 
+
   # --- Payment DB ---
   payment-db:
     image: postgres:17-alpine
@@ -162,6 +163,7 @@ services:
       DB_PASSWORD: ${DB_PASSWORD}
     ports:
       - "8083:8080"
+
 
   # --- Notification DB ---
   notification-db:

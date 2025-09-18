@@ -31,6 +31,8 @@ spring:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
 
+resend:
+  api-key: ${RESEND_API_KEY:re_JW5USEp3_3cYMb435X5SJSbeXmqp7WKZd}
 
 server:
   port: 8085

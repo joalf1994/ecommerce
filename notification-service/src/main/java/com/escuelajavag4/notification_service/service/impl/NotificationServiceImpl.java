@@ -6,20 +6,29 @@ import com.escuelajavag4.notification_service.model.entity.NotificationEntity;
 import com.escuelajavag4.notification_service.repository.NotificationRepository;
 import com.escuelajavag4.notification_service.service.INotificationService;
 import com.escuelajavag4.notification_service.mapper.NotificationMapper;
+import com.escuelajavag4.notification_service.template.EmailTemplates;
+import com.resend.services.emails.model.CreateEmailOptions;
+import com.resend.services.emails.model.CreateEmailResponse;
+import org.springframework.beans.factory.annotation.Value;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import java.time.Instant;
 import lombok.RequiredArgsConstructor;
-
+import com.resend.*;
 
 @Service
 @RequiredArgsConstructor
 public class NotificationServiceImpl implements INotificationService {
     private static final Logger log = LoggerFactory.getLogger(NotificationServiceImpl.class);
 
+
+    @Value("${resend.api-key}")
+    private String resendApiKey;
+
     private final NotificationRepository notificationRepository;
     private final NotificationMapper notificationMapper;
+
 
     @Override
     public void processOrderConfirmedEvent(OrderConfirmedEventDto orderConfirmedEventDto) {
@@ -49,5 +58,22 @@ public class NotificationServiceImpl implements INotificationService {
 
     private void simulateEmailSending(String orderId) {
         log.info("Simulando envío de email para el pedido: {}", orderId);
+
+        final String htmlBody = EmailTemplates.reservaConfirmada();
+        try{
+            Resend resend = new Resend(resendApiKey);
+
+            CreateEmailOptions sendEmailRequest = CreateEmailOptions.builder()
+                    .from("onboarding@resend.dev")
+                    .to("sandrogopher@gmail.com")
+                    .subject("Ecommerce G4 Java")
+                    .html(htmlBody)
+                    .build();
+
+            CreateEmailResponse data = resend.emails().send(sendEmailRequest);
+        } catch (Exception e) {
+            throw new RuntimeException("Error al enviar email");
+        }
+
     }
 }

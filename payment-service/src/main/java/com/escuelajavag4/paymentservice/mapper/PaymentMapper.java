@@ -11,7 +11,7 @@ import org.mapstruct.*;
 public interface PaymentMapper {
 
     @Mapping(target = "paymentId", ignore = true)
-    @Mapping(target = "status", ignore = false)
+    @Mapping(target = "status", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     Payment toEntity(PaymentCreateRequestDto dto);
 

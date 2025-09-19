@@ -60,7 +60,7 @@ public class NotificationServiceImpl implements INotificationService {
                 .orElseThrow(() -> new RuntimeException("Notificación no encontrada"));
     }
 
-    private void sendEmail(PaymentCompletedEvent paymentCompletedEvent) {
+    public void sendEmail(PaymentCompletedEvent paymentCompletedEvent) {
         log.info("Simulando envío de email para el pedido: {}", paymentCompletedEvent.getEmail());
 
         final String htmlBody = EmailTemplates.reservaConfirmada(paymentCompletedEvent.getAmount(), paymentCompletedEvent.getStatus());

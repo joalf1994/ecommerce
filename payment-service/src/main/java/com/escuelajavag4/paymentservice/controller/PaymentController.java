@@ -1,8 +1,10 @@
 package com.escuelajavag4.paymentservice.controller;
 
+import com.escuelajavag4.paymentservice.model.dto.OrderCompletedEventDto;
 import com.escuelajavag4.paymentservice.model.dto.PaymentCreateRequestDto;
 import com.escuelajavag4.paymentservice.model.dto.PaymentResponseDto;
 import com.escuelajavag4.paymentservice.model.dto.PaymentUpdateRequestDto;
+import com.escuelajavag4.paymentservice.model.entity.PaymentStatus;
 import com.escuelajavag4.paymentservice.service.PaymentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -19,9 +21,18 @@ public class PaymentController {
     private final PaymentService paymentService;
 
     @PostMapping
-    public ResponseEntity<PaymentResponseDto> create(@RequestBody PaymentCreateRequestDto dto) {
-        PaymentResponseDto response = paymentService.create(dto);
+    public ResponseEntity<PaymentResponseDto> create(@RequestBody OrderCompletedEventDto dto) {
+        PaymentResponseDto response = paymentService.createDeuda(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @PostMapping("/{paymentId}/pay")
+    public ResponseEntity<PaymentResponseDto> processPayment(
+            @PathVariable Long paymentId,
+            @RequestBody PaymentCreateRequestDto dto
+    ) {
+        PaymentResponseDto response = paymentService.processPayment(paymentId, dto);
+        return ResponseEntity.ok(response);
     }
 
     @PatchMapping("/{paymentId}/status")
@@ -55,5 +66,11 @@ public class PaymentController {
     public ResponseEntity<Void> delete(@PathVariable Long paymentId) {
         paymentService.delete(paymentId);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/status/{status}")
+    public ResponseEntity<List<PaymentResponseDto>> getByStatus(@PathVariable("status") PaymentStatus status) {
+        List<PaymentResponseDto> pagos = paymentService.findByStatus(status);
+        return ResponseEntity.ok(pagos);
     }
 }

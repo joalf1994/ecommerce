@@ -87,6 +87,11 @@ public class ProductServiceImpl implements ProductService {
     @Override
     @Transactional(readOnly = true)
     public List<ProductResponseDto> getProductsByCategory(Long categoryId) {
+        categoryRepository.findById(categoryId)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Category not found", "id=" + categoryId
+                ));
+
         return productRepository.findByCategoryId(categoryId)
                 .stream()
                 .map(productMapper::toResponseDto)
@@ -97,6 +102,11 @@ public class ProductServiceImpl implements ProductService {
     @Override
     @Transactional(readOnly = true)
     public List<ProductResponseDto> getProductsByMarca(Long marcaId) {
+        marcaRepository.findById(marcaId)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Marca not found", "id=" + marcaId
+                ));
+
         return productRepository.findByMarcaId(marcaId)
                 .stream()
                 .map(productMapper::toResponseDto)

@@ -1,14 +1,18 @@
 package com.escuelajavag4.catalogservice.controller;
 
+import com.escuelajavag4.catalogservice.exception.ResourceNotFoundException;
 import com.escuelajavag4.catalogservice.model.dto.request.ProductCreateRequestDto;
 import com.escuelajavag4.catalogservice.model.dto.request.ProductUpdateRequestDto;
 import com.escuelajavag4.catalogservice.model.dto.response.ProductResponseDto;
+import com.escuelajavag4.catalogservice.service.CategoryService;
+import com.escuelajavag4.catalogservice.service.MarcaService;
 import com.escuelajavag4.catalogservice.service.ProductService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -16,8 +20,9 @@ import java.util.List;
 @RequestMapping("/api/products")
 @RequiredArgsConstructor
 public class ProductController {
-
+    private final CategoryService categoryService;
     private final ProductService productService;
+    private final MarcaService marcaService;
 
     @PostMapping
     public ResponseEntity<ProductResponseDto> createProduct(

@@ -25,4 +25,5 @@ public interface PaymentService {
 
     List<PaymentResponseDto> findByStatus(PaymentStatus status);
 
+    void cacheOrderEmail(Long orderId, String email);
 }

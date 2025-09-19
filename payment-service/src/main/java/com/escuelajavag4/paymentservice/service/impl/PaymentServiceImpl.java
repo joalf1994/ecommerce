@@ -16,6 +16,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 @Service
@@ -26,6 +28,8 @@ public class PaymentServiceImpl implements PaymentService {
     private final PaymentRepository paymentRepository;
     private final PaymentMapper paymentMapper;
     private final PaymentEventProducer paymentEventProducer;
+    private final Map<Long, String> orderEmailCache = new ConcurrentHashMap<>();
+
 
     @Override
     public PaymentResponseDto createDeuda(OrderCompletedEventDto dto) {
@@ -104,17 +108,22 @@ public class PaymentServiceImpl implements PaymentService {
             deudaOriginal.setStatus(PaymentStatus.PAID_OFF);
             paymentRepository.save(deudaOriginal);
         }
+        String email = orderEmailCache.get(orderId);
+        launchEvent(savedPayment, email);
 
-        launchEvent(savedPayment);
+        if (nuevoBalance.compareTo(BigDecimal.ZERO) == 0) {
+            orderEmailCache.remove(orderId);
+        }
         return paymentMapper.toResponseDto(savedPayment);
     }
 
-    private void launchEvent(Payment updated) {
+    private void launchEvent(Payment updated, String email) {
         PaymentCompletedEvent event = new PaymentCompletedEvent();
         event.setOrderId(updated.getOrderId());
         event.setAmount(updated.getAmount());
         event.setPaymentId(updated.getPaymentId());
         event.setStatus(updated.getStatus().name());
+        event.setEmail(email);
         paymentEventProducer.emiter(event);
     }
 
@@ -173,5 +182,10 @@ public class PaymentServiceImpl implements PaymentService {
                 .map(paymentMapper::toResponseDto)
                 .collect(Collectors.toList());
     }
+
+    public void cacheOrderEmail(Long orderId, String email) {
+        orderEmailCache.put(orderId, email);
+    }
+
 
 }

@@ -13,6 +13,7 @@ public class PaymentEventListener {
 
     @KafkaListener(topics = "order-created", groupId = "payment-service")
     public void onOrderCreated(OrderCompletedEventDto event) {
+        paymentService.cacheOrderEmail(event.getOrderId(), event.getEmail());
         paymentService.createDeuda(event);
     }
 

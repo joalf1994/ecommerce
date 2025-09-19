@@ -20,6 +20,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
+
 @ExtendWith(MockitoExtension.class)
 class PaymentServiceImplTest {
 
@@ -34,7 +35,6 @@ class PaymentServiceImplTest {
 
     @InjectMocks
     private PaymentServiceImpl paymentService;
-
 
     @Test
     void crear_deuda_existente_lanza_excepcion() {
@@ -75,81 +75,85 @@ class PaymentServiceImplTest {
         assertThrows(IllegalArgumentException.class, () -> paymentService.createDeuda(dto));
     }
 
-
     @Test
-    void process_payment_pago_exacto_completa_pago() {
-        Payment payment = new Payment();
-        payment.setAmount(BigDecimal.valueOf(100));
-        payment.setStatus(PaymentStatus.PENDING);
+    void process_payment_exitoso_pago_total() {
+        Payment deuda = new Payment();
+        deuda.setOrderId(1L);
+        deuda.setAmount(BigDecimal.valueOf(100));
+        deuda.setStatus(PaymentStatus.PENDING);
 
         PaymentCreateRequestDto dto = new PaymentCreateRequestDto();
         dto.setAmount(BigDecimal.valueOf(100));
 
+        Payment pago = new Payment();
+        pago.setOrderId(1L);
+        pago.setAmount(BigDecimal.valueOf(100));
+        pago.setStatus(PaymentStatus.COMPLETED);
+
         PaymentResponseDto responseDto = new PaymentResponseDto();
 
-        when(paymentRepository.findById(1L)).thenReturn(Optional.of(payment));
-        when(paymentRepository.save(payment)).thenReturn(payment);
-        when(paymentMapper.toResponseDto(payment)).thenReturn(responseDto);
+        when(paymentRepository.findAllByOrderId(1L)).thenReturn(List.of(deuda));
+        when(paymentRepository.save(any(Payment.class))).thenReturn(pago);
+        when(paymentMapper.toResponseDto(pago)).thenReturn(responseDto);
 
         PaymentResponseDto resultado = paymentService.processPayment(1L, dto);
 
-        assertEquals(PaymentStatus.COMPLETED, payment.getStatus());
-        assertEquals(BigDecimal.ZERO, payment.getAmount());
         assertEquals(responseDto, resultado);
+        verify(paymentRepository, times(2)).save(any(Payment.class));
         verify(paymentEventProducer).emiter(any(PaymentCompletedEvent.class));
     }
 
     @Test
-    void process_payment_pago_parcial_actualiza_deuda() {
-        Payment payment = new Payment();
-        payment.setAmount(BigDecimal.valueOf(100));
-        payment.setStatus(PaymentStatus.PENDING);
+    void process_payment_exitoso_pago_parcial() {
+        Payment deuda = new Payment();
+        deuda.setOrderId(1L);
+        deuda.setAmount(BigDecimal.valueOf(100));
+        deuda.setStatus(PaymentStatus.PENDING);
 
         PaymentCreateRequestDto dto = new PaymentCreateRequestDto();
         dto.setAmount(BigDecimal.valueOf(40));
 
+        Payment pago = new Payment();
+        pago.setOrderId(1L);
+        pago.setAmount(BigDecimal.valueOf(40));
+        pago.setStatus(PaymentStatus.COMPLETED);
+
         PaymentResponseDto responseDto = new PaymentResponseDto();
 
-        when(paymentRepository.findById(1L)).thenReturn(Optional.of(payment));
-        when(paymentRepository.save(payment)).thenReturn(payment);
-        when(paymentMapper.toResponseDto(payment)).thenReturn(responseDto);
+        when(paymentRepository.findAllByOrderId(1L)).thenReturn(List.of(deuda));
+        when(paymentRepository.save(any(Payment.class))).thenReturn(pago);
+        when(paymentMapper.toResponseDto(pago)).thenReturn(responseDto);
 
         PaymentResponseDto resultado = paymentService.processPayment(1L, dto);
 
-        assertEquals(PaymentStatus.PENDING, payment.getStatus());
-        assertEquals(BigDecimal.valueOf(60), payment.getAmount());
         assertEquals(responseDto, resultado);
+        verify(paymentRepository, times(1)).save(any(Payment.class));
         verify(paymentEventProducer).emiter(any(PaymentCompletedEvent.class));
     }
 
     @Test
     void process_payment_pago_mayor_a_deuda_lanza_excepcion() {
-        Payment payment = new Payment();
-        payment.setAmount(BigDecimal.valueOf(100));
-        payment.setStatus(PaymentStatus.PENDING);
+        Payment deuda = new Payment();
+        deuda.setOrderId(1L);
+        deuda.setAmount(BigDecimal.valueOf(100));
+        deuda.setStatus(PaymentStatus.PENDING);
 
         PaymentCreateRequestDto dto = new PaymentCreateRequestDto();
         dto.setAmount(BigDecimal.valueOf(120));
 
-        when(paymentRepository.findById(1L)).thenReturn(Optional.of(payment));
+        when(paymentRepository.findAllByOrderId(1L)).thenReturn(List.of(deuda));
 
-        assertThrows(IllegalArgumentException.class,
-                () -> paymentService.processPayment(1L, dto));
+        assertThrows(IllegalArgumentException.class, () -> paymentService.processPayment(1L, dto));
     }
 
     @Test
-    void process_payment_pago_no_pending_lanza_excepcion() {
-        Payment payment = new Payment();
-        payment.setAmount(BigDecimal.valueOf(100));
-        payment.setStatus(PaymentStatus.COMPLETED);
+    void process_payment_sin_deuda_lanza_excepcion() {
+        when(paymentRepository.findAllByOrderId(1L)).thenReturn(List.of());
 
         PaymentCreateRequestDto dto = new PaymentCreateRequestDto();
         dto.setAmount(BigDecimal.valueOf(50));
 
-        when(paymentRepository.findById(1L)).thenReturn(Optional.of(payment));
-
-        assertThrows(IllegalStateException.class,
-                () -> paymentService.processPayment(1L, dto));
+        assertThrows(ResourceNotFoundException.class, () -> paymentService.processPayment(1L, dto));
     }
 
     @Test
@@ -178,7 +182,6 @@ class PaymentServiceImplTest {
         verify(paymentRepository).save(payment);
     }
 
-
     @Test
     void buscar_por_id_no_encontrado_lanza_excepcion() {
         when(paymentRepository.findById(1L)).thenReturn(Optional.empty());
@@ -198,7 +201,6 @@ class PaymentServiceImplTest {
 
         assertEquals(responseDto, resultado);
     }
-
 
     @Test
     void buscar_todos_devuelve_lista_de_dtos() {
@@ -220,7 +222,6 @@ class PaymentServiceImplTest {
         assertTrue(resultado.contains(dto2));
     }
 
-
     @Test
     void eliminar_pago_no_encontrado_lanza_excepcion() {
         when(paymentRepository.existsById(1L)).thenReturn(false);
@@ -236,7 +237,6 @@ class PaymentServiceImplTest {
 
         verify(paymentRepository).deleteById(1L);
     }
-
 
     @Test
     void buscar_por_order_id_no_encontrado_lanza_excepcion() {

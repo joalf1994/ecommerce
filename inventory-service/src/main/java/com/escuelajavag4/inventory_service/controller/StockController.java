@@ -5,6 +5,7 @@ import com.escuelajavag4.inventory_service.model.dto.request.StockReservedRespon
 import com.escuelajavag4.inventory_service.model.dto.response.StockResponseDto;
 import com.escuelajavag4.inventory_service.service.StockService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,32 +18,32 @@ public class StockController {
     private StockService stockService;
 
     @GetMapping
-    public List<StockResponseDto> getListStock() {
-        return stockService.getListStock();
+    public ResponseEntity<List<StockResponseDto>> getListStock() {
+        return ResponseEntity.ok(stockService.getListStock());
     }
 
     @GetMapping("/{productId}")
-    public List<StockResponseDto> getStockById(@PathVariable Long productId) {
-        return stockService.getStockById(productId);
+    public ResponseEntity<List<StockResponseDto>> getStockById(@PathVariable Long productId) {
+        return ResponseEntity.ok(stockService.getStockById(productId));
     }
 
     @PostMapping
-    public StockResponseDto createStock(@RequestBody StockCreateRequestDto stockCreateRequestDto) {
-        return  stockService.saveStock(stockCreateRequestDto);
+    public ResponseEntity<StockResponseDto> createStock(@RequestBody StockCreateRequestDto stockCreateRequestDto) {
+        return  ResponseEntity.ok(stockService.saveStock(stockCreateRequestDto));
     }
 
     @PutMapping("/{productId}/reserve")
-    public StockReservedResponseDto reserveStock(
+    public ResponseEntity<StockReservedResponseDto> reserveStock(
             @PathVariable Long productId,
             @RequestParam int cantidad
     ) {
-        return  stockService.reserveStock(productId, cantidad);
+        return  ResponseEntity.ok(stockService.reserveStock(productId, cantidad));
     }
 
     @GetMapping("/{productId}/validate")
-    public boolean validateStock( @PathVariable Long productId,
+    public ResponseEntity<Boolean> validateStock( @PathVariable Long productId,
                                   @RequestParam int cantidad){
-        return stockService.validateStock(productId, cantidad);
+        return ResponseEntity.ok(stockService.validateStock(productId, cantidad));
     }
 
 }

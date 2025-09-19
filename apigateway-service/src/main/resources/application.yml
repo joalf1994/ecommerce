@@ -1,0 +1,50 @@
+spring:
+  application:
+    name: apigateway-service
+
+  profiles:
+    active: dev
+#  cloud:
+#    gateway:
+#      server:
+#        webflux:
+#          routes:
+#            - id: customer-service
+#              uri: lb://customer-service
+#              predicates:
+#                - Path=/api/customers
+#
+#            - id: catalog-service
+#              uri: lb://catalog-service
+#              predicates:
+#                - Path=/api/categories, /api/brands, /api/products
+#
+#            - id: inventory-service
+#              uri: lb://inventory-service
+#              predicates:
+#                - Path=/inventory/reservations
+#
+#            - id: order-service
+#              uri: lb://order-service
+#              predicates:
+#                - Path=/orders, /order-items
+#
+#            - id: payment-service
+#              uri: lb://payment-service
+#              predicates:
+#                - Path=/api/payments, /api/payments/**
+#
+#            - id: notification-service
+#              uri: lb://notification-service
+#              predicates:
+#                - Path=/notifications
+#
+#server:
+#  port: 8090
+#
+#eureka:
+#  client:
+#    service-url:
+#      defaultZone: http://localhost:8761/eureka
+#    register-with-eureka: true
+#    fetch-registry: true

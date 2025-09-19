@@ -1,465 +1,283 @@
 services:
-  db_customer:
+  # --- Eureka Service ---
+  eureka-service:
+    build: ./eureka-service
+    container_name: eureka-service
+    ports:
+      - "8761:8761"
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8761/eureka/apps" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # --- Customer DB ---
+  customer-db:
     image: postgres:17-alpine
-    container_name: db_customer
+    container_name: customer-db
     restart: always
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
       POSTGRES_DB: customerdb
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
     ports:
       - "5433:5432"
     volumes:
-      - db_customer_data:/var/lib/postgresql/data
-#
-#  db_catalogo:
-#    image: postgres:17-alpine
-#    container_name: db_catalogo
-#    restart: always
-#    environment:
-#      POSTGRES_USER: postgres
-#      POSTGRES_PASSWORD: postgres
-#      POSTGRES_DB: catalogdb
-#    ports:
-#      - "5434:5432"
-#    volumes:
-#      - db_catalogo_data:/var/lib/postgresql/data
-#
-#  db_inventory:
-#    image: postgres:17-alpine
-#    container_name: db_inventory
-#    restart: always
-#    environment:
-#      POSTGRES_USER: postgres
-#      POSTGRES_PASSWORD: postgres
-#      POSTGRES_DB: inventorydb
-#    ports:
-#      - "5435:5432"
-#    volumes:
-#      - db_inventory_data:/var/lib/postgresql/data
-#
-#  db_order:
-#    image: postgres:17-alpine
-#    container_name: db_order
-#    restart: always
-#    environment:
-#      POSTGRES_USER: postgres
-#      POSTGRES_PASSWORD: postgres
-#      POSTGRES_DB: orderdb
-#    ports:
-#      - "5436:5432"
-#    volumes:
-#      - db_order_data:/var/lib/postgresql/data
-#
-#  db_payment:
-#    image: postgres:17-alpine
-#    container_name: db_payment
-#    restart: always
-#    environment:
-#      POSTGRES_USER: postgres
-#      POSTGRES_PASSWORD: postgres
-#      POSTGRES_DB: paymentdb
-#    ports:
-#      - "5437:5432"
-#    volumes:
-#      - db_payment_data:/var/lib/postgresql/data
-#
-#  db_notification:
-#    image: postgres:17-alpine
-#    container_name: db_notification
-#    restart: always
-#    environment:
-#      POSTGRES_USER: postgres
-#      POSTGRES_PASSWORD: postgres
-#      POSTGRES_DB: notificationdb
-#    ports:
-#      - "5438:5432"
-#    volumes:
-#      - db_notification_data:/var/lib/postgresql/data
+      - customer_data:/var/lib/postgresql/data
 
-volumes:
-  db_customer_data:
-#  db_catalogo_data:
-#  db_inventory_data:
-#  db_order_data:
-#  db_payment_data:
-#  db_notification_data:
-
-
-
-
-
-
-
-
-
-version: "3.9"
-
-networks:
-  backend:
-    driver: bridge
-
-volumes:
-  pg_order_data:
-  pg_catalog_data:
-  pg_inventory_data:
-  pg_payment_data:
-  pg_customer_data:
-  pg_notification_data:
-  zk_data:
-  kafka_data:
-
-services:
-  # ------------------------
-  # Infra
-  # ------------------------
-  eureka:
-    image: eclipse-temurin:17-jre
-    container_name: eureka
-    command: ["java","-jar","/app/eureka.jar"]
-    volumes:
-      - ./eureka/target:/app
-    environment:
-      - SERVER_PORT=${EUREKA_PORT}
-      - EUREKA_CLIENT_REGISTER_WITH_EUREKA=false
-      - EUREKA_CLIENT_FETCH_REGISTRY=false
-      - EUREKA_SERVER_ENABLE_SELF_PRESERVATION=false
-      - JAVA_TOOL_OPTIONS=-Xms128m -Xmx256m
-    ports:
-      - "${EUREKA_PORT}:8761"
-    healthcheck:
-      test: ["CMD", "wget", "-qO-", "http://localhost:8761/"]
-      interval: 10s
-      timeout: 5s
-      retries: 12
-    networks: [backend]
-    restart: unless-stopped
-
-  config-server:
-    image: eclipse-temurin:17-jre
-    container_name: config-server
-    command: ["java","-jar","/app/config.jar"]
-    volumes:
-      - ./config-server/target:/app
-      - ./config-repo:/config-repo:ro
-    environment:
-      - SERVER_PORT=8888
-      - SPRING_PROFILES_ACTIVE=native
-      - SPRING_CLOUD_CONFIG_SERVER_NATIVE_SEARCH_LOCATIONS=file:/config-repo
-      - JAVA_TOOL_OPTIONS=-Xms128m -Xmx256m
-    ports:
-      - "8888:8888"
-    depends_on:
-      eureka:
-        condition: service_healthy
-    healthcheck:
-      test: ["CMD", "wget", "-qO-", "http://localhost:8888/actuator/health"]
-      interval: 10s
-      timeout: 5s
-      retries: 12
-    networks: [backend]
-    restart: unless-stopped
-
-  zipkin:
-    image: openzipkin/zipkin:2.24
-    container_name: zipkin
-    ports:
-      - "${ZIPKIN_PORT}:9411"
-    networks: [backend]
-    restart: unless-stopped
-
-  zookeeper:
-    image: confluentinc/cp-zookeeper:7.6.1
-    container_name: zookeeper
-    environment:
-      ZOOKEEPER_CLIENT_PORT: 2181
-      ZOOKEEPER_TICK_TIME: 2000
-    volumes:
-      - zk_data:/var/lib/zookeeper/data
-    networks: [backend]
-    restart: unless-stopped
-
-  kafka:
-    image: confluentinc/cp-kafka:7.6.1
-    container_name: kafka
-    depends_on:
-      - zookeeper
-    environment:
-      KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      # Importante: listeners internos para docker
-      KAFKA_LISTENERS: PLAINTEXT://kafka:9092
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-    volumes:
-      - kafka_data:/var/lib/kafka/data
-    ports:
-      - "${KAFKA_BROKER_PORT}:9092"
-    networks: [backend]
-    restart: unless-stopped
-
-  # ------------------------
-  # Bases de datos (una por microservicio)
-  # ------------------------
-  postgres-order:
-    image: postgres:16
-    container_name: postgres-order
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB_ORDER}
-    ports: ["5433:5432"]
-    volumes: [pg_order_data:/var/lib/postgresql/data]
-    networks: [backend]
-    restart: unless-stopped
-
-  postgres-catalog:
-    image: postgres:16
-    container_name: postgres-catalog
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB_CATALOG}
-    ports: ["5434:5432"]
-    volumes: [pg_catalog_data:/var/lib/postgresql/data]
-    networks: [backend]
-    restart: unless-stopped
-
-  postgres-inventory:
-    image: postgres:16
-    container_name: postgres-inventory
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB_INVENTORY}
-    ports: ["5435:5432"]
-    volumes: [pg_inventory_data:/var/lib/postgresql/data]
-    networks: [backend]
-    restart: unless-stopped
-
-  postgres-payment:
-    image: postgres:16
-    container_name: postgres-payment
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB_PAYMENT}
-    ports: ["5436:5432"]
-    volumes: [pg_payment_data:/var/lib/postgresql/data]
-    networks: [backend]
-    restart: unless-stopped
-
-  postgres-customer:
-    image: postgres:16
-    container_name: postgres-customer
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB_CUSTOMER}
-    ports: ["5437:5432"]
-    volumes: [pg_customer_data:/var/lib/postgresql/data]
-    networks: [backend]
-    restart: unless-stopped
-
-  postgres-notification:
-    image: postgres:16
-    container_name: postgres-notification
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB_NOTIFICATION}
-    ports: ["5438:5432"]
-    volumes: [pg_notification_data:/var/lib/postgresql/data]
-    networks: [backend]
-    restart: unless-stopped
-
-  # ------------------------
-  # API Gateway
-  # ------------------------
-  api-gateway:
-    image: eclipse-temurin:17-jre
-    container_name: api-gateway
-    command: ["java","-jar","/app/gateway.jar"]
-    volumes:
-      - ./api-gateway/target:/app
-    environment:
-      - SERVER_PORT=${GATEWAY_PORT}
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka:8761/eureka
-      - SPRING_CLOUD_CONFIG_URI=http://config-server:8888
-      - MANAGEMENT_ZIPKIN_TRACING_ENDPOINT=http://zipkin:9411/api/v2/spans
-      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE}
-      - JAVA_TOOL_OPTIONS=-Xms128m -Xmx256m
-    ports:
-      - "${GATEWAY_PORT}:8080"
-    depends_on:
-      eureka:
-        condition: service_healthy
-      config-server:
-        condition: service_healthy
-    networks: [backend]
-    restart: unless-stopped
-
-  # ------------------------
-  # Microservicios (ejemplo completo para order-service; los demás son análogos)
-  # ------------------------
-  order-service:
-    image: eclipse-temurin:17-jre
-    container_name: order-service
-    command: ["java","-jar","/app/order.jar"]
-    volumes:
-      - ./order-service/target:/app
-    environment:
-      - SERVER_PORT=8080
-      - SPRING_APPLICATION_NAME=order-service
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka:8761/eureka
-      - SPRING_CLOUD_CONFIG_URI=http://config-server:8888
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-order:5432/${POSTGRES_DB_ORDER}
-      - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}
-      - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
-      - SPRING_JPA_HIBERNATE_DDL_AUTO=validate
-      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
-      - MANAGEMENT_ZIPKIN_TRACING_ENDPOINT=http://zipkin:9411/api/v2/spans
-      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE}
-      - JAVA_TOOL_OPTIONS=-Xms256m -Xmx512m
-    depends_on:
-      eureka:
-        condition: service_healthy
-      postgres-order:
-        condition: service_started
-      kafka:
-        condition: service_started
-      config-server:
-        condition: service_healthy
-    networks: [backend]
-    restart: unless-stopped
-
-  catalog-service:
-    image: eclipse-temurin:17-jre
-    container_name: catalog-service
-    command: ["java","-jar","/app/catalog.jar"]
-    volumes:
-      - ./catalog-service/target:/app
-    environment:
-      - SPRING_APPLICATION_NAME=catalog-service
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka:8761/eureka
-      - SPRING_CLOUD_CONFIG_URI=http://config-server:8888
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-catalog:5432/${POSTGRES_DB_CATALOG}
-      - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}
-      - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
-      - MANAGEMENT_ZIPKIN_TRACING_ENDPOINT=http://zipkin:9411/api/v2/spans
-      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE}
-    depends_on:
-      eureka:
-        condition: service_healthy
-      postgres-catalog:
-        condition: service_started
-      config-server:
-        condition: service_healthy
-    networks: [backend]
-    restart: unless-stopped
-
-  inventory-service:
-    image: eclipse-temurin:17-jre
-    container_name: inventory-service
-    command: ["java","-jar","/app/inventory.jar"]
-    volumes:
-      - ./inventory-service/target:/app
-    environment:
-      - SPRING_APPLICATION_NAME=inventory-service
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka:8761/eureka
-      - SPRING_CLOUD_CONFIG_URI=http://config-server:8888
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-inventory:5432/${POSTGRES_DB_INVENTORY}
-      - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}
-      - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
-      - MANAGEMENT_ZIPKIN_TRACING_ENDPOINT=http://zipkin:9411/api/v2/spans
-      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE}
-    depends_on:
-      eureka:
-        condition: service_healthy
-      postgres-inventory:
-        condition: service_started
-      config-server:
-        condition: service_healthy
-    networks: [backend]
-    restart: unless-stopped
-
-  payment-service:
-    image: eclipse-temurin:17-jre
-    container_name: payment-service
-    command: ["java","-jar","/app/payment.jar"]
-    volumes:
-      - ./payment-service/target:/app
-    environment:
-      - SPRING_APPLICATION_NAME=payment-service
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka:8761/eureka
-      - SPRING_CLOUD_CONFIG_URI=http://config-server:8888
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-payment:5432/${POSTGRES_DB_PAYMENT}
-      - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}
-      - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
-      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
-      - MANAGEMENT_ZIPKIN_TRACING_ENDPOINT=http://zipkin:9411/api/v2/spans
-      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE}
-    depends_on:
-      eureka:
-        condition: service_healthy
-      postgres-payment:
-        condition: service_started
-      kafka:
-        condition: service_started
-      config-server:
-        condition: service_healthy
-    networks: [backend]
-    restart: unless-stopped
-
+  # --- Customer Service ---
   customer-service:
-    image: eclipse-temurin:17-jre
-    container_name: customer-service
-    command: ["java","-jar","/app/customer.jar"]
-    volumes:
-      - ./customer-service/target:/app
-    environment:
-      - SPRING_APPLICATION_NAME=customer-service
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka:8761/eureka
-      - SPRING_CLOUD_CONFIG_URI=http://config-server:8888
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-customer:5432/${POSTGRES_DB_CUSTOMER}
-      - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}
-      - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
-      - MANAGEMENT_ZIPKIN_TRACING_ENDPOINT=http://zipkin:9411/api/v2/spans
-      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE}
-    depends_on:
-      eureka:
-        condition: service_healthy
-      postgres-customer:
-        condition: service_started
-      config-server:
-        condition: service_healthy
-    networks: [backend]
-    restart: unless-stopped
+      build: ./customer-service
+      container_name: customer-service
+      depends_on:
+        - customer-db
+        - eureka-service
+      environment:
+        SPRING_PROFILES_ACTIVE: prod
+        DB_HOST: customer-db
+        DB_NAME: customerdb
+        DB_USER: ${DB_USER}
+        DB_PASSWORD: ${DB_PASSWORD}
+        EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-service:8761/eureka
+      ports:
+        - "8080:8080"
 
-  notification-service:
-    image: eclipse-temurin:17-jre
-    container_name: notification-service
-    command: ["java","-jar","/app/notification.jar"]
-    volumes:
-      - ./notification-service/target:/app
+  # --- Catalog DB ---
+  catalog-db:
+    image: postgres:17-alpine
+    container_name: catalog-db
+    restart: always
     environment:
-      - SPRING_APPLICATION_NAME=notification-service
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka:8761/eureka
-      - SPRING_CLOUD_CONFIG_URI=http://config-server:8888
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-notification:5432/${POSTGRES_DB_NOTIFICATION}
-      - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}
-      - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
-      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
-      - MANAGEMENT_ZIPKIN_TRACING_ENDPOINT=http://zipkin:9411/api/v2/spans
-      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE}
+      POSTGRES_DB: catalogdb
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "5434:5432"
+    volumes:
+      - catalog_data:/var/lib/postgresql/data
+
+  # --- Catalog Service ---
+  catalog-service:
+    build: ./catalog_service
+    container_name: catalog-service
     depends_on:
-      eureka:
-        condition: service_healthy
-      postgres-notification:
-        condition: service_started
-      kafka:
-        condition: service_started
-      config-server:
-        condition: service_healthy
-    networks: [backend]
+      - catalog-db
+      - eureka-service
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      DB_HOST: catalog-db
+      DB_NAME: catalogdb
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-service:8761/eureka
+    ports:
+      - "8082:8080"
+
+  # --- Inventory DB ---
+  inventory-db:
+    image: postgres:17-alpine
+    container_name: inventory-db
+    restart: always
+    environment:
+      POSTGRES_DB: inventorydb
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "5435:5432"
+    volumes:
+      - inventory_data:/var/lib/postgresql/data
+
+  # --- Inventory Service ---
+  inventory-service:
+    build: ./inventory-service
+    container_name: inventory-service
+    depends_on:
+      - inventory-db
+      - eureka-service
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      DB_HOST: inventory-db
+      DB_NAME: inventorydb
+      DB_USER: ${DB_USER}
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-service:8761/eureka
+      DB_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "8081:8080"
+
+  # --- Order DB ---
+  order-db:
+    image: postgres:17-alpine
+    container_name: order-db
+    restart: always
+    environment:
+      POSTGRES_DB: orderdb
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "5436:5432"
+    volumes:
+      - order_data:/var/lib/postgresql/data
+
+  # --- Order Service ---
+  order-service:
+    build: ./order-service
+    container_name: order-service
+    depends_on:
+      - order-db
+      - eureka-service
+      - kafka-ui
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      DB_HOST: order-db
+      DB_NAME: orderdb
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-service:8761/eureka
+    ports:
+      - "8084:8080"
+
+
+  # --- Payment DB ---
+  payment-db:
+    image: postgres:17-alpine
+    container_name: payment-db
+    restart: always
+    environment:
+      POSTGRES_DB: paymentdb
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "5437:5432"
+    volumes:
+      - payment_data:/var/lib/postgresql/data
+
+  # --- Payment Service ---
+  payment-service:
+    build: ./payment-service
+    container_name: payment-service
+    depends_on:
+      - payment-db
+      - eureka-service
+      - kafka-ui
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      DB_HOST: payment-db
+      DB_NAME: paymentdb
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-service:8761/eureka
+    ports:
+      - "8083:8080"
+
+
+  # --- Notification DB ---
+  notification-db:
+    image: postgres:17-alpine
+    container_name: notification-db
+    restart: always
+    environment:
+      POSTGRES_DB: notificationdb
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "5438:5432"
+    volumes:
+      - notification_data:/var/lib/postgresql/data
+
+  # --- Notification Service ---
+  notification-service:
+    build: ./notification-service
+    container_name: notification-service
+    depends_on:
+      - notification-db
+      - eureka-service
+      - kafka-ui
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      DB_HOST: notification-db
+      DB_NAME: notificationdb
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      RESEND_API_KEY: ${RESEND_API_KEY}
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-service:8761/eureka
+    ports:
+      - "8085:8080"
+
+  # --- Kafka Service ---
+  kafka:
+    image: bitnami/kafka:3.6
+    container_name: kafka
     restart: unless-stopped
+    ports:
+      - "9092:9092"
+      - "9094:9094"
+    environment:
+      - KAFKA_CFG_NODE_ID=1
+      - KAFKA_CFG_PROCESS_ROLES=broker,controller
+      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=1@kafka:9093
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093,PLAINTEXT_HOST://:9094
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:9094
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
+      - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=PLAINTEXT
+      - ALLOW_PLAINTEXT_LISTENER=yes
+
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: kafka-ui
+    restart: unless-stopped
+    ports:
+      - "8086:8080"
+    environment:
+      - KAFKA_CLUSTERS_0_NAME=local
+      - KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS=kafka:9092
+    depends_on:
+      - kafka
+
+  # --- API Gateway ---
+  gateway-service:
+    build: ./apigateway-service
+    container_name: gateway-service
+    ports:
+      - "8090:8090"
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      SPRING_APPLICATION_NAME: apigateway-service
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-service:8761/eureka
+    depends_on:
+      - eureka-service
+      - customer-service
+      - catalog-service
+      - inventory-service
+      - order-service
+      - payment-service
+      - notification-service
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "8089:80"
+    depends_on:
+      - customer-db
+      - catalog-db
+      - inventory-db
+      - order-db
+      - payment-db
+      - notification-db
+
+volumes:
+  customer_data:
+  catalog_data:
+  inventory_data:
+  order_data:
+  payment_data:
+  notification_data:
+
+
+
+

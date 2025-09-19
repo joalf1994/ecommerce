@@ -1,0 +1,1317 @@
+{
+	"info": {
+		"_postman_id": "89323ace-4b86-4a37-981b-7e746e58de42",
+		"name": "Project Ecommerce",
+		"description": "# 🚀 Get started here\n\nThis template guides you through CRUD operations (GET, POST, PUT, DELETE), variables, and tests.\n\n## 🔖 **How to use this template**\n\n#### **Step 1: Send requests**\n\nRESTful APIs allow you to perform CRUD operations using the POST, GET, PUT, and DELETE HTTP methods.\n\nThis collection contains each of these [request](https://learning.postman.com/docs/sending-requests/requests/) types. Open each request and click \"Send\" to see what happens.\n\n#### **Step 2: View responses**\n\nObserve the response tab for status code (200 OK), response time, and size.\n\n#### **Step 3: Send new Body data**\n\nUpdate or add new data in \"Body\" in the POST request. Typically, Body data is also used in PUT request.\n\n```\n{\n    \"name\": \"Add your name in the body\"\n}\n\n ```\n\n#### **Step 4: Update the variable**\n\nVariables enable you to store and reuse values in Postman. We have created a [variable](https://learning.postman.com/docs/sending-requests/variables/) called `base_url` with the sample request [https://postman-api-learner.glitch.me](https://postman-api-learner.glitch.me). Replace it with your API endpoint to customize this collection.\n\n#### **Step 5: Add tests in the \"Scripts\" tab**\n\nAdding tests to your requests can help you confirm that your API is working as expected. You can write test scripts in JavaScript and view the output in the \"Test Results\" tab.\n\n<img src=\"https://content.pstmn.io/fa30ea0a-373d-4545-a668-e7b283cca343/aW1hZ2UucG5n\" alt=\"\" height=\"1530\" width=\"2162\">\n\n## 💪 Pro tips\n\n- Use folders to group related requests and organize the collection.\n    \n- Add more [scripts](https://learning.postman.com/docs/writing-scripts/intro-to-scripts/) to verify if the API works as expected and execute workflows.\n    \n\n## 💡Related templates\n\n[API testing basics](https://go.postman.co/redirect/workspace?type=personal&collectionTemplateId=e9a37a28-055b-49cd-8c7e-97494a21eb54&sourceTemplateId=ddb19591-3097-41cf-82af-c84273e56719)  \n[API documentation](https://go.postman.co/redirect/workspace?type=personal&collectionTemplateId=e9c28f47-1253-44af-a2f3-20dce4da1f18&sourceTemplateId=ddb19591-3097-41cf-82af-c84273e56719)  \n[Authorization methods](https://go.postman.co/redirect/workspace?type=personal&collectionTemplateId=31a9a6ed-4cdf-4ced-984c-d12c9aec1c27&sourceTemplateId=ddb19591-3097-41cf-82af-c84273e56719)",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "24518506"
+	},
+	"item": [
+		{
+			"name": "catalog-ms",
+			"item": [
+				{
+					"name": "category",
+					"item": [
+						{
+							"name": "getAllCategories",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"name\": \"Add your name in the body\"\n}"
+								},
+								"url": {
+									"raw": "{{gateway_base}}/api/categories",
+									"host": [
+										"{{gateway_base}}"
+									],
+									"path": [
+										"api",
+										"categories"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "getCategoryById",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{gateway_base}}/api/categories/1",
+									"host": [
+										"{{gateway_base}}"
+									],
+									"path": [
+										"api",
+										"categories",
+										"1"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "getCategoryWithProducts",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"name\": \"Add your name in the body\"\n}"
+								},
+								"url": {
+									"raw": "{{gateway_base}}/api/categories/1/with-products",
+									"host": [
+										"{{gateway_base}}"
+									],
+									"path": [
+										"api",
+										"categories",
+										"1",
+										"with-products"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "getCategoryByName",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/categories/search?name=laptops",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"categories",
+										"search"
+									],
+									"query": [
+										{
+											"key": "name",
+											"value": "laptops"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "getActiveCategories",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{gateway_base}}/api/categories/active",
+									"host": [
+										"{{gateway_base}}"
+									],
+									"path": [
+										"api",
+										"categories",
+										"active"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "createCategory",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"name\": \"Categoria nueva\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{gateway_base}}/api/categories",
+									"host": [
+										"{{gateway_base}}"
+									],
+									"path": [
+										"api",
+										"categories"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "updateCategory",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"name\":\"categoria_actualizada_gateway\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{gateway_base}}/api/categories/1",
+									"host": [
+										"{{gateway_base}}"
+									],
+									"path": [
+										"api",
+										"categories",
+										"1"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "desactivateCategory",
+							"request": {
+								"method": "PATCH",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"name\":\"fdgdf\"\r\n}"
+								},
+								"url": {
+									"raw": "{{gateway_base}}/api/categories/1/deactivate",
+									"host": [
+										"{{gateway_base}}"
+									],
+									"path": [
+										"api",
+										"categories",
+										"1",
+										"deactivate"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "deleteCategory",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"name\":\"fdgdf\"\r\n}"
+								},
+								"url": {
+									"raw": "{{base_url}}/categories/1",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"categories",
+										"1"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "activateCategory",
+							"request": {
+								"method": "PATCH",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"name\":\"fdgdf\"\r\n}"
+								},
+								"url": {
+									"raw": "{{gateway_base}}/api/categories/1/activate",
+									"host": [
+										"{{gateway_base}}"
+									],
+									"path": [
+										"api",
+										"categories",
+										"1",
+										"activate"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Marca",
+					"item": [
+						{
+							"name": "getAllMarcas",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"name\":\"fdgdf\"\r\n}"
+								},
+								"url": {
+									"raw": "{{gateway_base}}/api/brands",
+									"host": [
+										"{{gateway_base}}"
+									],
+									"path": [
+										"api",
+										"brands"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "getMarcaById",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"name\":\"fdgdf\"\r\n}"
+								},
+								"url": {
+									"raw": "{{gateway_base}}/api/brands/1",
+									"host": [
+										"{{gateway_base}}"
+									],
+									"path": [
+										"api",
+										"brands",
+										"1"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "getMarcaByName",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"name\":\"fdgdf\"\r\n}"
+								},
+								"url": {
+									"raw": "{{gateway_base}}/api/brands/search?name=HP",
+									"host": [
+										"{{gateway_base}}"
+									],
+									"path": [
+										"api",
+										"brands",
+										"search"
+									],
+									"query": [
+										{
+											"key": "name",
+											"value": "HP"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "getActiveMarcas",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{gateway_base}}/api/brands/1",
+									"host": [
+										"{{gateway_base}}"
+									],
+									"path": [
+										"api",
+										"brands",
+										"1"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "updateMarca",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"name\":\"fdgdf\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{gateway_base}}/api/brands/1",
+									"host": [
+										"{{gateway_base}}"
+									],
+									"path": [
+										"api",
+										"brands",
+										"1"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "activateMarca",
+							"request": {
+								"method": "PATCH",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"name\":\"fdgdf\"\r\n}"
+								},
+								"url": {
+									"raw": "{{gateway_base}}/api/brands/1/activate",
+									"host": [
+										"{{gateway_base}}"
+									],
+									"path": [
+										"api",
+										"brands",
+										"1",
+										"activate"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "desactivateMarca",
+							"request": {
+								"method": "PATCH",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"name\":\"fdgdf\"\r\n}"
+								},
+								"url": {
+									"raw": "{{gateway_base}}/api/brands/1/deactivate",
+									"host": [
+										"{{gateway_base}}"
+									],
+									"path": [
+										"api",
+										"brands",
+										"1",
+										"deactivate"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "deleteMarca",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"name\":\"fdgdf\"\r\n}"
+								},
+								"url": {
+									"raw": "{{gateway_base}}/api/brands/1",
+									"host": [
+										"{{gateway_base}}"
+									],
+									"path": [
+										"api",
+										"brands",
+										"1"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "createMarca",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"name\": \"LG\",\r\n    \"description\":\"Marca popular\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{gateway_base}}/api/brands",
+									"host": [
+										"{{gateway_base}}"
+									],
+									"path": [
+										"api",
+										"brands"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Product",
+					"item": [
+						{
+							"name": "createProduct",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"code\": \"P001\",\r\n    \"name\":\"Play 6\",\r\n    \"description\":\"Producto de prueba 2\",\r\n    \"shortDescription\":\"prod_2\",\r\n    \"price\":100.00,\r\n    \"categoryId\":1,\r\n    \"marcaId\":1\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{gateway_base}}/api/products",
+									"host": [
+										"{{gateway_base}}"
+									],
+									"path": [
+										"api",
+										"products"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "getAllProducts",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{gateway_base}}/api/products",
+									"host": [
+										"{{gateway_base}}"
+									],
+									"path": [
+										"api",
+										"products"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "getProductById",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{gateway_base}}/api/products/2",
+									"host": [
+										"{{gateway_base}}"
+									],
+									"path": [
+										"api",
+										"products",
+										"2"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "searchProductsByname",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{gateway_base}}/api/products/search?name=Play 5",
+									"host": [
+										"{{gateway_base}}"
+									],
+									"path": [
+										"api",
+										"products",
+										"search"
+									],
+									"query": [
+										{
+											"key": "name",
+											"value": "Play 5"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "getActiveProducts",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{gateway_base}}/api/products/active",
+									"host": [
+										"{{gateway_base}}"
+									],
+									"path": [
+										"api",
+										"products",
+										"active"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "getProductsByCategory",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{gateway_base}}/api/products/category/3",
+									"host": [
+										"{{gateway_base}}"
+									],
+									"path": [
+										"api",
+										"products",
+										"category",
+										"3"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "getProductsByMarca",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{gateway_base}}/api/products/brand/1",
+									"host": [
+										"{{gateway_base}}"
+									],
+									"path": [
+										"api",
+										"products",
+										"brand",
+										"1"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "updateProduct",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"url": {
+									"raw": "{{gateway_base}}/api/products/1",
+									"host": [
+										"{{gateway_base}}"
+									],
+									"path": [
+										"api",
+										"products",
+										"1"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "activateProduct",
+							"request": {
+								"method": "PATCH",
+								"header": [],
+								"url": {
+									"raw": "{{gateway_base}}/api/products/1/activate",
+									"host": [
+										"{{gateway_base}}"
+									],
+									"path": [
+										"api",
+										"products",
+										"1",
+										"activate"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "deactivateProduct",
+							"request": {
+								"method": "PATCH",
+								"header": [],
+								"url": {
+									"raw": "{{gateway_base}}/api/products/1/deactivate",
+									"host": [
+										"{{gateway_base}}"
+									],
+									"path": [
+										"api",
+										"products",
+										"1",
+										"deactivate"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "deleteProduct",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{gateway_base}}/api/products/1",
+									"host": [
+										"{{gateway_base}}"
+									],
+									"path": [
+										"api",
+										"products",
+										"1"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "payment-ms",
+			"item": [
+				{
+					"name": "findByIdPayment",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{gateway_base}}/api/payments/1",
+							"host": [
+								"{{gateway_base}}"
+							],
+							"path": [
+								"api",
+								"payments",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "findByOrderId",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{gateway_base}}/api/payments/order/1",
+							"host": [
+								"{{gateway_base}}"
+							],
+							"path": [
+								"api",
+								"payments",
+								"order",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "findAllPayments",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{gateway_base}}/api/payments",
+							"host": [
+								"{{gateway_base}}"
+							],
+							"path": [
+								"api",
+								"payments"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "deletePayment",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{gateway_base}}/api/payments/1",
+							"host": [
+								"{{gateway_base}}"
+							],
+							"path": [
+								"api",
+								"payments",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getByStatus",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"customerId\": \"1\",\n    \"items\": [\n        {\"productId\":1,\"qty\":11},\n        {\"productId\":2,\"qty\":3}\n        ],\n    \"paymentMethod\": \"YAPE\"\n}\n"
+						},
+						"url": {
+							"raw": "{{gateway_base}}/api/payments/status/PENDING",
+							"host": [
+								"{{gateway_base}}"
+							],
+							"path": [
+								"api",
+								"payments",
+								"status",
+								"PENDING"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "processPaymentByOrderID",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"orderId\":1,\r\n    \"amount\":1000\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{gateway_base}}/api/payments/pay",
+							"host": [
+								"{{gateway_base}}"
+							],
+							"path": [
+								"api",
+								"payments",
+								"pay"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "customer-ms",
+			"item": [
+				{
+					"name": "getAllCustomers",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{gateway_base}}/api/customers",
+							"host": [
+								"{{gateway_base}}"
+							],
+							"path": [
+								"api",
+								"customers"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "createCustomer",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\" : \"sandrogopher@gmail.com\",\r\n    \"fullName\" : \"Sandro Castro\",\r\n    \"level\" : \"JUNIOR\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{gateway_base}}/api/customers",
+							"host": [
+								"{{gateway_base}}"
+							],
+							"path": [
+								"api",
+								"customers"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getCustomerById",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{gateway_base}}/api/customers/1",
+							"host": [
+								"{{gateway_base}}"
+							],
+							"path": [
+								"api",
+								"customers",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getActiveCustomerById",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{gateway_base}}/api/customers/1/active",
+							"host": [
+								"{{gateway_base}}"
+							],
+							"path": [
+								"api",
+								"customers",
+								"1",
+								"active"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "deactivateById",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "{{gateway_base}}/api/customers/2/deactivate",
+							"host": [
+								"{{gateway_base}}"
+							],
+							"path": [
+								"api",
+								"customers",
+								"2",
+								"deactivate"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getCustomerByEmail",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{gateway_base}}/api/customers/search?email=abc@gmail.com",
+							"host": [
+								"{{gateway_base}}"
+							],
+							"path": [
+								"api",
+								"customers",
+								"search"
+							],
+							"query": [
+								{
+									"key": "email",
+									"value": "abc@gmail.com"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "updateCustomer",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"fullName\":\"Nombre actualizado\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{gateway_base}}/api/customers/1",
+							"host": [
+								"{{gateway_base}}"
+							],
+							"path": [
+								"api",
+								"customers",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "deleteCustomer",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"fullName\":\"Nombre actualizado\"\r\n}"
+						},
+						"url": {
+							"raw": "{{gateway_base}}/api/customers/1",
+							"host": [
+								"{{gateway_base}}"
+							],
+							"path": [
+								"api",
+								"customers",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "activateCustomer",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"fullName\":\"Nombre actualizado\"\r\n}"
+						},
+						"url": {
+							"raw": "{{gateway_base}}/api/customers/2/activate",
+							"host": [
+								"{{gateway_base}}"
+							],
+							"path": [
+								"api",
+								"customers",
+								"2",
+								"activate"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "inventory-ms",
+			"item": [
+				{
+					"name": "createStock",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"productId\": 2,\r\n  \"warehouseId\": 2,\r\n  \"available\": 200\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{gateway_base}}/inventory/reservations",
+							"host": [
+								"{{gateway_base}}"
+							],
+							"path": [
+								"inventory",
+								"reservations"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getListStock",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{gateway_base}}/inventory/reservations",
+							"host": [
+								"{{gateway_base}}"
+							],
+							"path": [
+								"inventory",
+								"reservations"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "reserveStockByProductId",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{gateway_base}}/inventory/reservations/3/reserve?cantidad=25",
+							"host": [
+								"{{gateway_base}}"
+							],
+							"path": [
+								"inventory",
+								"reservations",
+								"3",
+								"reserve"
+							],
+							"query": [
+								{
+									"key": "cantidad",
+									"value": "25"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getStockByIdProduct",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{gateway_base}}/inventory/reservations/1",
+							"host": [
+								"{{gateway_base}}"
+							],
+							"path": [
+								"inventory",
+								"reservations",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "validatedStock",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{gateway_base}}/inventory/reservations/2/validate?cantidad=20",
+							"host": [
+								"{{gateway_base}}"
+							],
+							"path": [
+								"inventory",
+								"reservations",
+								"2",
+								"validate"
+							],
+							"query": [
+								{
+									"key": "cantidad",
+									"value": "20"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Order-Service",
+			"item": [
+				{
+					"name": "createOrder",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Successful POST request\", function () {",
+									"    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"customerId\": \"3\",\n    \"items\": \n    [\n        {\"productId\":1,\"qty\":19}\n    ],\n    \"paymentMethod\": \"YAPE\"\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{gateway_base}}/orders/create",
+							"host": [
+								"{{gateway_base}}"
+							],
+							"path": [
+								"orders",
+								"create"
+							]
+						},
+						"description": "This is a POST request, submitting data to an API via the request body. This request submits JSON data, and the data is reflected in the response.\n\nA successful POST request typically returns a `200 OK` or `201 Created` response code."
+					},
+					"response": []
+				},
+				{
+					"name": "get_order_by_id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{gateway_base}}/orders/1",
+							"host": [
+								"{{gateway_base}}"
+							],
+							"path": [
+								"orders",
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "notification-ms",
+			"item": [
+				{
+					"name": "NotificationById",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{gateway_base}}/notifications/1",
+							"host": [
+								"{{gateway_base}}"
+							],
+							"path": [
+								"notifications",
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": ""
+		}
+	]
+}

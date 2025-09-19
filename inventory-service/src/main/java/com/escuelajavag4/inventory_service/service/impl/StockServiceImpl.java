@@ -45,11 +45,7 @@ public class StockServiceImpl implements StockService {
                 stockCreateRequestDto.getProductId(),
                 stockCreateRequestDto.getWarehouseId()
         )) {
-            throw new DuplicateResourceException(
-                    "Stock",
-                    "productId + warehouseId",
-                    stockCreateRequestDto.getProductId() + " - " + stockCreateRequestDto.getWarehouseId()
-            );
+            throw new DuplicateResourceException("ProductId o WarehouseId existe");
         }
 
         if (stockCreateRequestDto.getAvailable() <= 0) {

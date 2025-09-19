@@ -77,7 +77,7 @@ public class NotificationServiceImpl implements INotificationService {
 
             CreateEmailResponse data = resend.emails().send(sendEmailRequest);
         } catch (Exception e) {
-            throw new RuntimeException("Error al enviar email");
+            log.info("Error al enviar correo a resend");
         }
 
     }

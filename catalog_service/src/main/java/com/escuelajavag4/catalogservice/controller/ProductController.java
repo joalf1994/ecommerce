@@ -51,33 +51,9 @@ public class ProductController {
         return ResponseEntity.ok(productService.getProductsByCategory(categoryId));
     }
 
-    @GetMapping("/category/{categoryId}/active")
-    public ResponseEntity<List<ProductResponseDto>> getActiveProductsByCategory(@PathVariable Long categoryId) {
-        return ResponseEntity.ok(productService.getActiveProductsByCategory(categoryId));
-    }
-
     @GetMapping("/brand/{marcaId}")
     public ResponseEntity<List<ProductResponseDto>> getProductsByMarca(@PathVariable Long marcaId) {
         return ResponseEntity.ok(productService.getProductsByMarca(marcaId));
-    }
-
-    @GetMapping("/brand/{marcaId}/active")
-    public ResponseEntity<List<ProductResponseDto>> getActiveProductsByMarca(@PathVariable Long marcaId) {
-        return ResponseEntity.ok(productService.getActiveProductsByMarca(marcaId));
-    }
-
-    @GetMapping("/category/{categoryId}/brand/{marcaId}")
-    public ResponseEntity<List<ProductResponseDto>> getProductsByCategoryAndMarca(
-            @PathVariable Long categoryId,
-            @PathVariable Long marcaId) {
-        return ResponseEntity.ok(productService.getProductsByCategoryAndMarca(categoryId, marcaId));
-    }
-
-    @GetMapping("/category/{categoryId}/brand/{marcaId}/active")
-    public ResponseEntity<List<ProductResponseDto>> getActiveProductsByCategoryAndMarca(
-            @PathVariable Long categoryId,
-            @PathVariable Long marcaId) {
-        return ResponseEntity.ok(productService.getActiveProductsByCategoryAndMarca(categoryId, marcaId));
     }
 
     @PutMapping("/{id}")

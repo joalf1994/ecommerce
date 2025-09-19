@@ -93,14 +93,6 @@ public class ProductServiceImpl implements ProductService {
                 .toList();
     }
 
-    @Override
-    @Transactional(readOnly = true)
-    public List<ProductResponseDto> getActiveProductsByCategory(Long categoryId) {
-        return productRepository.findByCategoryIdAndActiveTrue(categoryId)
-                .stream()
-                .map(productMapper::toResponseDto)
-                .toList();
-    }
 
     @Override
     @Transactional(readOnly = true)
@@ -113,35 +105,8 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ProductResponseDto> getActiveProductsByMarca(Long marcaId) {
-        return productRepository.findByMarcaIdAndActiveTrue(marcaId)
-                .stream()
-                .map(productMapper::toResponseDto)
-                .toList();
-    }
-
-    @Override
-    @Transactional(readOnly = true)
     public List<ProductResponseDto> searchProductsByName(String name) {
         return productRepository.findByNameContainingIgnoreCase(name)
-                .stream()
-                .map(productMapper::toResponseDto)
-                .toList();
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<ProductResponseDto> getProductsByCategoryAndMarca(Long categoryId, Long marcaId) {
-        return productRepository.findByCategoryIdAndMarcaId(categoryId, marcaId)
-                .stream()
-                .map(productMapper::toResponseDto)
-                .toList();
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<ProductResponseDto> getActiveProductsByCategoryAndMarca(Long categoryId, Long marcaId) {
-        return productRepository.findByCategoryIdAndMarcaIdAndActiveTrue(categoryId, marcaId)
                 .stream()
                 .map(productMapper::toResponseDto)
                 .toList();

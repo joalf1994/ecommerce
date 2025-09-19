@@ -27,7 +27,7 @@ public class NotificationControllerTest {
     @Test
     void shouldReturnNotificationByOrderId() throws Exception {
         NotificationDto dto = new NotificationDto();
-        dto.setOrderId("123");
+        dto.setOrderId(123L);
         dto.setStatus("SENT");
         dto.setChannel("EMAIL");
         dto.setSentAt(Instant.now());

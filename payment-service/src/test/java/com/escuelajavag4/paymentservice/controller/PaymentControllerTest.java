@@ -90,11 +90,11 @@ class PaymentControllerTest {
 
         when(paymentService.findAllByOrderId(1L)).thenReturn(paymentDtos);
 
-        ResponseEntity<List<PaymentResponseDto>> response = paymentController.findByOrderId(1L);
+        ResponseEntity<List<PaymentResponseDto>> response = paymentController.findAllByOrderId(1L);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(paymentDtos, response.getBody());
-        verify(paymentService).findByOrderId(1L);
+        verify(paymentService).findAllByOrderId(1L);
     }
 
     @Test

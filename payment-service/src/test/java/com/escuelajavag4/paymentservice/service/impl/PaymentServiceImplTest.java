@@ -77,12 +77,14 @@ class PaymentServiceImplTest {
 
     @Test
     void process_payment_exitoso_pago_total() {
+        // Arrange
         Payment deuda = new Payment();
         deuda.setOrderId(1L);
         deuda.setAmount(BigDecimal.valueOf(100));
         deuda.setStatus(PaymentStatus.PENDING);
 
         PaymentCreateRequestDto dto = new PaymentCreateRequestDto();
+        dto.setOrderId(1L);
         dto.setAmount(BigDecimal.valueOf(100));
 
         Payment pago = new Payment();
@@ -111,6 +113,7 @@ class PaymentServiceImplTest {
         deuda.setStatus(PaymentStatus.PENDING);
 
         PaymentCreateRequestDto dto = new PaymentCreateRequestDto();
+        dto.setOrderId(1L);
         dto.setAmount(BigDecimal.valueOf(40));
 
         Payment pago = new Payment();
@@ -133,17 +136,22 @@ class PaymentServiceImplTest {
 
     @Test
     void process_payment_pago_mayor_a_deuda_lanza_excepcion() {
+        // Arrange
         Payment deuda = new Payment();
         deuda.setOrderId(1L);
         deuda.setAmount(BigDecimal.valueOf(100));
         deuda.setStatus(PaymentStatus.PENDING);
 
         PaymentCreateRequestDto dto = new PaymentCreateRequestDto();
+        dto.setOrderId(1L);
         dto.setAmount(BigDecimal.valueOf(120));
 
         when(paymentRepository.findAllByOrderId(1L)).thenReturn(List.of(deuda));
 
-        assertThrows(IllegalArgumentException.class, () -> paymentService.processPayment(dto));
+        ResourceNotFoundException ex = assertThrows(ResourceNotFoundException.class,
+                () -> paymentService.processPayment(dto));
+
+        assertTrue(ex.getMessage().contains("El pago excede la deuda restante"));
     }
 
     @Test
@@ -151,6 +159,7 @@ class PaymentServiceImplTest {
         when(paymentRepository.findAllByOrderId(1L)).thenReturn(List.of());
 
         PaymentCreateRequestDto dto = new PaymentCreateRequestDto();
+        dto.setOrderId(1L);
         dto.setAmount(BigDecimal.valueOf(50));
 
         assertThrows(ResourceNotFoundException.class, () -> paymentService.processPayment(dto));

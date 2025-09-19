@@ -50,7 +50,7 @@ public class PaymentController {
     }
 
     @GetMapping("/order/{orderId}")
-    public ResponseEntity<List<PaymentResponseDto>> findByOrderId(@PathVariable Long orderId) {
+    public ResponseEntity<List<PaymentResponseDto>> findAllByOrderId(@PathVariable Long orderId) {
         List<PaymentResponseDto> responses = paymentService.findAllByOrderId(orderId);
         return ResponseEntity.ok(responses);
     }

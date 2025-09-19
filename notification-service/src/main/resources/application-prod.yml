@@ -4,6 +4,7 @@ spring:
     url: jdbc:postgresql://${DB_HOST}:5432/${DB_NAME}
     username: ${DB_USER}
     password: ${DB_PASSWORD}
+    RESEND_API_KEY: ${RESEND_API_KEY}
 
   jpa:
     hibernate:
@@ -25,9 +26,6 @@ spring:
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
-
-  resend:
-    api-key: ${API_KEY}
 
   server:
     port: 8085

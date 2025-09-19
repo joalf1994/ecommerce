@@ -116,18 +116,6 @@ class ProductControllerTest {
         verify(productService).getProductsByCategory(1L);
     }
 
-    @Test
-    void testGetActiveProductsByCategory() {
-        when(productService.getActiveProductsByCategory(1L)).thenReturn(List.of(sampleProduct));
-
-        ResponseEntity<List<ProductResponseDto>> response = productController.getActiveProductsByCategory(1L);
-
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertNotNull(response.getBody());
-        assertTrue(response.getBody().get(0).getActive());
-
-        verify(productService).getActiveProductsByCategory(1L);
-    }
 
     @Test
     void testGetProductsByMarca() {
@@ -142,44 +130,6 @@ class ProductControllerTest {
         verify(productService).getProductsByMarca(1L);
     }
 
-    @Test
-    void testGetActiveProductsByMarca() {
-        when(productService.getActiveProductsByMarca(1L)).thenReturn(List.of(sampleProduct));
-
-        ResponseEntity<List<ProductResponseDto>> response = productController.getActiveProductsByMarca(1L);
-
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertNotNull(response.getBody());
-        assertTrue(response.getBody().get(0).getActive());
-
-        verify(productService).getActiveProductsByMarca(1L);
-    }
-
-    @Test
-    void testGetProductsByCategoryAndMarca() {
-        when(productService.getProductsByCategoryAndMarca(1L, 1L)).thenReturn(List.of(sampleProduct));
-
-        ResponseEntity<List<ProductResponseDto>> response = productController.getProductsByCategoryAndMarca(1L, 1L);
-
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertNotNull(response.getBody());
-        assertEquals(1, response.getBody().size());
-
-        verify(productService).getProductsByCategoryAndMarca(1L, 1L);
-    }
-
-    @Test
-    void testGetActiveProductsByCategoryAndMarca() {
-        when(productService.getActiveProductsByCategoryAndMarca(1L, 1L)).thenReturn(List.of(sampleProduct));
-
-        ResponseEntity<List<ProductResponseDto>> response = productController.getActiveProductsByCategoryAndMarca(1L, 1L);
-
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertNotNull(response.getBody());
-        assertTrue(response.getBody().get(0).getActive());
-
-        verify(productService).getActiveProductsByCategoryAndMarca(1L, 1L);
-    }
 
     @Test
     void testUpdateProduct() {

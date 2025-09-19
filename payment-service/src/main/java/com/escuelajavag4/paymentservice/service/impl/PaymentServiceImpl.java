@@ -17,6 +17,7 @@ import java.math.BigDecimal;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -56,12 +57,12 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    public PaymentResponseDto processPayment(Long orderId, PaymentCreateRequestDto dto) {
-        List<Payment> pagosAndDeudas = paymentRepository.findAllByOrderId(orderId);
+    public PaymentResponseDto processPayment(PaymentCreateRequestDto dto) {
+        List<Payment> pagosAndDeudas = paymentRepository.findAllByOrderId(dto.getOrderId());
 
         if (pagosAndDeudas.isEmpty()) {
             throw new ResourceNotFoundException("PAYMENT_NOT_FOUND",
-                    "No se encontró nada registrado para la orden: " + orderId);
+                    "No se encontró nada registrado para la orden: " + dto.getOrderId());
         }
 
         Payment deudaOriginal = pagosAndDeudas.stream()
@@ -70,7 +71,7 @@ public class PaymentServiceImpl implements PaymentService {
                 .orElseThrow(() -> new IllegalStateException("No se encontró la deuda original"));
 
         if (deudaOriginal.getStatus() == PaymentStatus.PAID_OFF) {
-            throw new IllegalStateException("La deuda ya está completamente pagada");
+            throw new ResourceNotFoundException("La deuda ya está completamente pagada","");
         }
 
         List<Payment> pagosRealizados = pagosAndDeudas.stream()
@@ -84,20 +85,20 @@ public class PaymentServiceImpl implements PaymentService {
         BigDecimal balance = deudaOriginal.getAmount().subtract(totalPagado);
 
         if (balance.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new IllegalStateException("La deuda ya está completamente pagada");
+            throw new ResourceNotFoundException("La deuda ya está completamente pagada","");
         }
 
         if (dto.getAmount().compareTo(balance) > 0) {
-            throw new IllegalArgumentException("El pago excede la deuda restante. " +
-                    "Restante: " + balance + ", Intentado: " + dto.getAmount());
+            throw new ResourceNotFoundException("El pago excede la deuda restante. " +
+                    "Restante: " + balance + ", Intentado: " + dto.getAmount(),"");
         }
 
         if (dto.getAmount().compareTo(BigDecimal.ZERO) <= 0) {
-            throw new IllegalArgumentException("El monto del pago debe ser mayor a cero");
+            throw new ResourceNotFoundException("El monto del pago debe ser mayor a cero",dto.getAmount());
         }
 
         Payment newPayment = new Payment();
-        newPayment.setOrderId(orderId);
+        newPayment.setOrderId(dto.getOrderId());
         newPayment.setAmount(dto.getAmount());
         newPayment.setStatus(PaymentStatus.COMPLETED);
 
@@ -108,11 +109,11 @@ public class PaymentServiceImpl implements PaymentService {
             deudaOriginal.setStatus(PaymentStatus.PAID_OFF);
             paymentRepository.save(deudaOriginal);
         }
-        String email = orderEmailCache.get(orderId);
+        String email = orderEmailCache.get(dto.getOrderId());
         launchEvent(savedPayment, email);
 
         if (nuevoBalance.compareTo(BigDecimal.ZERO) == 0) {
-            orderEmailCache.remove(orderId);
+            orderEmailCache.remove(dto.getOrderId());
         }
         return paymentMapper.toResponseDto(savedPayment);
     }
@@ -162,6 +163,14 @@ public class PaymentServiceImpl implements PaymentService {
             throw new ResourceNotFoundException("PAYMENT_NOT_FOUND",
                     "No se encontró el pago con id: " + paymentId);
         }
+
+        Optional<Payment> payment = paymentRepository.findById(paymentId);
+        if (payment.isPresent() && payment.get().getStatus() == PaymentStatus.PAID_OFF) {
+            throw new ResourceNotFoundException("IMPOSIBLE",
+                    "La deuda ya fue cancelada: " + paymentId);
+        }
+
+
         paymentRepository.deleteById(paymentId);
     }
 
@@ -169,9 +178,21 @@ public class PaymentServiceImpl implements PaymentService {
     @Transactional(readOnly = true)
     public PaymentResponseDto findByOrderId(Long orderId) {
         Payment payment = paymentRepository.findByOrderId(orderId)
-                .orElseThrow(() -> new ResourceNotFoundException("PAYMENT_NOT_FOUND",
-                        "No se encontró el pago para orderId: " + orderId));
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "PAYMENT_NOT_FOUND", "No se encontró el pago para orderId: " + orderId));
         return paymentMapper.toResponseDto(payment);
+    }
+    @Override
+    @Transactional(readOnly = true)
+    public List<PaymentResponseDto> findAllByOrderId(Long orderId) {
+        List<Payment> payments = paymentRepository.findAllByOrderId(orderId);
+        if (payments.isEmpty()) {
+            throw new ResourceNotFoundException("PAYMENT_NOT_FOUND",
+                    "No se encontraron pagos para orderId: " + orderId);
+        }
+        return payments.stream()
+                .map(paymentMapper::toResponseDto)
+                .toList();
     }
 
     @Override

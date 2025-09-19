@@ -4,6 +4,7 @@ import com.escuelajavag4.order_service.dto.OrderDto;
 import com.escuelajavag4.order_service.dto.OrderItemDto;
 import com.escuelajavag4.order_service.dto.OrderItemRequestDto;
 import com.escuelajavag4.order_service.dto.OrderRequestDto;
+import com.escuelajavag4.order_service.dto.customer.CustomerDto;
 import com.escuelajavag4.order_service.dto.inventory.StockReservedDto;
 import com.escuelajavag4.order_service.dto.kafka.OrderCompletedEventDto;
 import com.escuelajavag4.order_service.dto.product.ProductDto;
@@ -23,12 +24,14 @@ import com.escuelajavag4.order_service.repository.IOrderRepository;
 import com.escuelajavag4.order_service.service.IOrderItemService;
 import com.escuelajavag4.order_service.service.IOrderService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class OrderServiceImpl implements IOrderService {
@@ -51,18 +54,21 @@ public class OrderServiceImpl implements IOrderService {
                 .orElseThrow(() -> new OrderNotFoundException("Order with id " + id + " not found"));
         OrderDto orderDto = orderMapper.toDto(order);
 
-        List<OrderItemDto> orderItemDtos = orderItemService.orderItemsByProductId(id);
-        orderDto.setItems(orderItemDtos);
+        // Validación defensiva: si la lista es null, usar lista vacía
+        List<OrderItemDto> orderItemDtos = ((order.getItems() != null ? order.getItems() : List.<OrderItem>of()))
+                .stream()
+                .map(orderItemMapper::toDto)
+                .toList();
 
+        orderDto.setItems(orderItemDtos);
+        // Si la lista sigue vacía, revisar que los OrderItem realmente tengan la referencia a la Order y estén guardados correctamente
         return orderDto;
     }
 
     @Override
     public OrderDto createOrder(OrderRequestDto request) {
-
         validateCustomer(request.getCustomerId());
         String email = customerClient.getCustomerById(request.getCustomerId()).getEmail();
-
 
         Order order = orderMapper.toEntity(request);
         order.setStatus("CREATED");
@@ -71,17 +77,14 @@ public class OrderServiceImpl implements IOrderService {
         validateActiveProductAndStock(request.getItems());
 
         List<OrderItem> items = request.getItems().stream()
-                .map(dto ->  {
+                .map(dto -> {
                     ProductDto product = catalogClient.getProductById(dto.getProductId());
-
-                    StockReservedDto StockReserved = inventoryClient.reserveStock(dto.getProductId(), dto.getQty());
+                    inventoryClient.reserveStock(dto.getProductId(), dto.getQty());
 
                     OrderItem item = orderItemMapper.toEntity(dto, order);
                     item.setUnitPrice(product.getPrice());
                     BigDecimal subTotal = product.getPrice().multiply(BigDecimal.valueOf(dto.getQty()));
                     item.setSubtotal(subTotal);
-
-                    orderItemService.createOrderItem(item);
 
                     return item;
                 })
@@ -90,38 +93,46 @@ public class OrderServiceImpl implements IOrderService {
         order.setItems(items);
 
         BigDecimal amount = items.stream()
-                        .map(OrderItem::getSubtotal)
-                        .reduce(BigDecimal.ZERO, BigDecimal::add);
+                .map(OrderItem::getSubtotal)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         order.setTotal(amount.doubleValue());
 
         Order savedOrder = orderRepository.save(order);
 
         OrderCompletedEventDto orderCompletedEventDto = new OrderCompletedEventDto();
-                orderCompletedEventDto.setOrderId(order.getId());
-                orderCompletedEventDto.setAmount(amount);
-                orderCompletedEventDto.setEmail(email);
+        orderCompletedEventDto.setOrderId(savedOrder.getId()); // aquí sí tienes el id
+        orderCompletedEventDto.setAmount(amount);
+        orderCompletedEventDto.setEmail(email);
 
         orderEventProducer.emisorCompletedEvent(orderCompletedEventDto);
 
         return orderMapper.toDto(savedOrder);
     }
 
+
     private void validateCustomer(Long customerId) {
-        try {
-            customerClient.getActiveCustomerById(customerId);
-        } catch (feign.FeignException.NotFound e) {
+        CustomerDto customer = customerClient.getActiveCustomerById(customerId);
+        if (customer == null) {
             throw new CustomerNotFoundException("Customer with id " + customerId + " not found");
         }
     }
 
     private void validateActiveProductAndStock(List<OrderItemRequestDto> items) {
         for (OrderItemRequestDto item : items) {
-            ProductDto product = catalogClient.getProductById(item.getProductId());
-            if (product == null || !product.getActive()) {
+            Long productId = item.getProductId();
+            Integer qty = item.getQty();
+
+            ProductDto product = catalogClient.getProductById(productId);
+            if (product == null || Boolean.FALSE.equals(product.getActive())) {
                 throw new ProductNotFoundException("Product " + item.getProductId() + " not available");
             }
-            boolean disponible = inventoryClient.hasSufficientStock(item.getProductId(), item.getQty());
+            
+            if (qty == null || qty <= 0) {
+                throw new StockInsufficientException("La cantidad debe ser mayor a cero para el producto " + productId);
+            }
+
+            boolean disponible = inventoryClient.hasSufficientStock(productId, qty);
             if (!disponible) {
                 throw new StockInsufficientException("No hay suficiente stock para el producto " + item.getProductId());
             }

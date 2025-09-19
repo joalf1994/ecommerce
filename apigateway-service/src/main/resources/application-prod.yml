@@ -1,9 +1,4 @@
 spring:
-  application:
-    name: apigateway-service
-
-  profiles:
-    active: dev
   cloud:
     gateway:
       server:
@@ -32,7 +27,7 @@ spring:
             - id: payment-service
               uri: lb://payment-service
               predicates:
-                - Path=/api/payments, /api/payments/**
+                - Path=/api/payments
 
             - id: notification-service
               uri: lb://notification-service
@@ -45,6 +40,6 @@ server:
 eureka:
   client:
     service-url:
-      defaultZone: http://localhost:8761/eureka
+      defaultZone: http://eureka-service:8761/eureka
     register-with-eureka: true
     fetch-registry: true

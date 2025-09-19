@@ -38,6 +38,7 @@ services:
         DB_NAME: customerdb
         DB_USER: ${DB_USER}
         DB_PASSWORD: ${DB_PASSWORD}
+        EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-service:8761/eureka
       ports:
         - "8080:8080"
 
@@ -68,6 +69,7 @@ services:
       DB_NAME: catalogdb
       DB_USER: ${DB_USER}
       DB_PASSWORD: ${DB_PASSWORD}
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-service:8761/eureka
     ports:
       - "8082:8080"
 
@@ -97,6 +99,7 @@ services:
       DB_HOST: inventory-db
       DB_NAME: inventorydb
       DB_USER: ${DB_USER}
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-service:8761/eureka
       DB_PASSWORD: ${DB_PASSWORD}
     ports:
       - "8081:8080"
@@ -129,6 +132,7 @@ services:
       DB_NAME: orderdb
       DB_USER: ${DB_USER}
       DB_PASSWORD: ${DB_PASSWORD}
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-service:8761/eureka
     ports:
       - "8084:8080"
 
@@ -161,6 +165,7 @@ services:
       DB_NAME: paymentdb
       DB_USER: ${DB_USER}
       DB_PASSWORD: ${DB_PASSWORD}
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-service:8761/eureka
     ports:
       - "8083:8080"
 
@@ -193,6 +198,8 @@ services:
       DB_NAME: notificationdb
       DB_USER: ${DB_USER}
       DB_PASSWORD: ${DB_PASSWORD}
+      RESEND_API_KEY: ${RESEND_API_KEY}
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-service:8761/eureka
     ports:
       - "8085:8080"
 
@@ -220,12 +227,36 @@ services:
     container_name: kafka-ui
     restart: unless-stopped
     ports:
-      - "8085:8080"
+      - "8086:8080"
     environment:
       - KAFKA_CLUSTERS_0_NAME=local
       - KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS=kafka:9092
     depends_on:
       - kafka
+
+  # --- API Gateway ---
+  gateway-service:
+    build: ./apigateway-service
+    container_name: gateway-service
+    ports:
+      - "8090:8090"
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      SPRING_APPLICATION_NAME: apigateway-service
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-service:8761/eureka
+    depends_on:
+      - eureka-service
+      - customer-service
+      - catalog-service
+      - inventory-service
+      - order-service
+      - payment-service
+      - notification-service
+
+
+
+
+
 
 volumes:
   customer_data:

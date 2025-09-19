@@ -1,9 +1,4 @@
 spring:
-  application:
-    name: apigateway-service
-
-  profiles:
-    active: dev
   cloud:
     gateway:
       server:
@@ -14,7 +9,7 @@ spring:
               predicates:
                 - Path=/api/customers
 
-            - id: catalog-service
+            - id: catalog_service
               uri: lb://catalog-service
               predicates:
                 - Path=/api/categories, /api/brands, /api/products
@@ -32,7 +27,7 @@ spring:
             - id: payment-service
               uri: lb://payment-service
               predicates:
-                - Path=/api/payments, /api/payments/**
+                - Path=/api/payments
 
             - id: notification-service
               uri: lb://notification-service

@@ -3,6 +3,7 @@ package com.escuelajavag4.inventory_service.controller.advice;
 import com.escuelajavag4.inventory_service.exception.DuplicateResourceException;
 import com.escuelajavag4.inventory_service.exception.ErrorResponse;
 import com.escuelajavag4.inventory_service.exception.ProductNotFoundException;
+import com.escuelajavag4.inventory_service.exception.StockInsufficientException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -47,7 +48,7 @@ public class GobalExceptionHandler {
         return ResponseEntity.badRequest().body(error);
     }
 
-    @ExceptionHandler(DuplicateResourceException.class)
+    @ExceptionHandler(StockInsufficientException.class)
     public ResponseEntity<ErrorResponse> handleStockInsufficient(DuplicateResourceException ex) {
         ErrorResponse error = ErrorResponse.builder()
                 .status(HttpStatus.BAD_REQUEST.value())

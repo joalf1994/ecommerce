@@ -52,13 +52,13 @@ class PaymentControllerTest {
     @Test
     void procesar_pago_llama_servicio_y_devuelve_dto() {
         PaymentCreateRequestDto dto = new PaymentCreateRequestDto();
-        when(paymentService.processPayment(1L, dto)).thenReturn(paymentDto);
+        when(paymentService.processPayment(dto)).thenReturn(paymentDto);
 
-        ResponseEntity<PaymentResponseDto> response = paymentController.processPayment(1L, dto);
+        ResponseEntity<PaymentResponseDto> response = paymentController.processPayment(dto);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(paymentDto, response.getBody());
-        verify(paymentService).processPayment(1L, dto);
+        verify(paymentService).processPayment(dto);
     }
 
     @Test
@@ -85,13 +85,15 @@ class PaymentControllerTest {
     }
 
     @Test
-    void buscar_por_order_id_llama_servicio_y_devuelve_dto() {
-        when(paymentService.findByOrderId(1L)).thenReturn(paymentDto);
+    void buscar_por_order_id_llama_servicio_y_devuelve_lista_dto() {
+        List<PaymentResponseDto> paymentDtos = List.of(paymentDto);
 
-        ResponseEntity<PaymentResponseDto> response = paymentController.findByOrderId(1L);
+        when(paymentService.findAllByOrderId(1L)).thenReturn(paymentDtos);
+
+        ResponseEntity<List<PaymentResponseDto>> response = paymentController.findByOrderId(1L);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(paymentDto, response.getBody());
+        assertEquals(paymentDtos, response.getBody());
         verify(paymentService).findByOrderId(1L);
     }
 

@@ -26,12 +26,11 @@ public class PaymentController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @PostMapping("/{paymentId}/pay")
+    @PostMapping("/pay")
     public ResponseEntity<PaymentResponseDto> processPayment(
-            @PathVariable Long paymentId,
             @RequestBody PaymentCreateRequestDto dto
     ) {
-        PaymentResponseDto response = paymentService.processPayment(paymentId, dto);
+        PaymentResponseDto response = paymentService.processPayment(dto);
         return ResponseEntity.ok(response);
     }
 
@@ -51,9 +50,9 @@ public class PaymentController {
     }
 
     @GetMapping("/order/{orderId}")
-    public ResponseEntity<PaymentResponseDto> findByOrderId(@PathVariable Long orderId) {
-        PaymentResponseDto response = paymentService.findByOrderId(orderId);
-        return ResponseEntity.ok(response);
+    public ResponseEntity<List<PaymentResponseDto>> findByOrderId(@PathVariable Long orderId) {
+        List<PaymentResponseDto> responses = paymentService.findAllByOrderId(orderId);
+        return ResponseEntity.ok(responses);
     }
 
     @GetMapping

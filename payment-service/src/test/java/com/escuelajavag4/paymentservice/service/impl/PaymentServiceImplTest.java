@@ -96,7 +96,7 @@ class PaymentServiceImplTest {
         when(paymentRepository.save(any(Payment.class))).thenReturn(pago);
         when(paymentMapper.toResponseDto(pago)).thenReturn(responseDto);
 
-        PaymentResponseDto resultado = paymentService.processPayment(1L, dto);
+        PaymentResponseDto resultado = paymentService.processPayment(dto);
 
         assertEquals(responseDto, resultado);
         verify(paymentRepository, times(2)).save(any(Payment.class));
@@ -124,7 +124,7 @@ class PaymentServiceImplTest {
         when(paymentRepository.save(any(Payment.class))).thenReturn(pago);
         when(paymentMapper.toResponseDto(pago)).thenReturn(responseDto);
 
-        PaymentResponseDto resultado = paymentService.processPayment(1L, dto);
+        PaymentResponseDto resultado = paymentService.processPayment(dto);
 
         assertEquals(responseDto, resultado);
         verify(paymentRepository, times(1)).save(any(Payment.class));
@@ -143,7 +143,7 @@ class PaymentServiceImplTest {
 
         when(paymentRepository.findAllByOrderId(1L)).thenReturn(List.of(deuda));
 
-        assertThrows(IllegalArgumentException.class, () -> paymentService.processPayment(1L, dto));
+        assertThrows(IllegalArgumentException.class, () -> paymentService.processPayment(dto));
     }
 
     @Test
@@ -153,7 +153,7 @@ class PaymentServiceImplTest {
         PaymentCreateRequestDto dto = new PaymentCreateRequestDto();
         dto.setAmount(BigDecimal.valueOf(50));
 
-        assertThrows(ResourceNotFoundException.class, () -> paymentService.processPayment(1L, dto));
+        assertThrows(ResourceNotFoundException.class, () -> paymentService.processPayment(dto));
     }
 
     @Test
@@ -246,15 +246,18 @@ class PaymentServiceImplTest {
     }
 
     @Test
-    void buscar_por_order_id_exitoso_devuelve_dto() {
+    void buscar_por_order_id_exitoso_devuelve_lista_dto() {
         Payment payment = new Payment();
         PaymentResponseDto responseDto = new PaymentResponseDto();
 
-        when(paymentRepository.findByOrderId(1L)).thenReturn(Optional.of(payment));
+        List<Payment> payments = List.of(payment);
+
+        when(paymentRepository.findAllByOrderId(1L)).thenReturn(payments);
         when(paymentMapper.toResponseDto(payment)).thenReturn(responseDto);
 
-        PaymentResponseDto resultado = paymentService.findByOrderId(1L);
+        List<PaymentResponseDto> resultado = paymentService.findAllByOrderId(1L);
 
-        assertEquals(responseDto, resultado);
+        assertEquals(1, resultado.size());
+        assertEquals(responseDto, resultado.get(0));
     }
 }

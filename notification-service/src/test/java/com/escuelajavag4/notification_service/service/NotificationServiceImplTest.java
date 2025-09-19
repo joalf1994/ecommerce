@@ -39,6 +39,12 @@ class NotificationServiceImplTest {
         event.setAmount(BigDecimal.valueOf(100.0));
         event.setStatus("COMPLETED");
         event.setEmail("sandrogopher@gmail.com");
+
+        // Spy sobre notificationService para no ejecutar sendEmail real
+        notificationService = Mockito.spy(notificationService);
+
+        // Marca el stub como "lenient" para que no falle si no se usa
+        lenient().doNothing().when(notificationService).sendEmail(any(PaymentCompletedEvent.class));
     }
 
     @Test
@@ -57,19 +63,19 @@ class NotificationServiceImplTest {
 
     @Test
     void getNotificationByOrderId_shouldReturnDto() {
-        NotificationEntity entity = new NotificationEntity(1L, 123L, "SENT", "EMAIL", Instant.now());
-        NotificationDto dto = new NotificationDto();
-        dto.setOrderId("123");
-        dto.setStatus("SENT");
-        dto.setChannel("EMAIL");
-        dto.setSentAt(entity.getSentAt());
+        NotificationEntity notificationEntity = new NotificationEntity(1L, 123L, "SENT", "EMAIL", Instant.now());
+        NotificationDto notificationDto = new NotificationDto();
+        notificationDto.setOrderId(123L);
+        notificationDto.setStatus("SENT");
+        notificationDto.setChannel("EMAIL");
+        notificationDto.setSentAt(notificationEntity.getSentAt());
 
-        when(notificationRepository.findFirstByOrderIdOrderBySentAtDesc(123L)).thenReturn(Optional.of(entity));
-        when(notificationMapper.toDto(entity)).thenReturn(dto);
+        when(notificationRepository.findFirstByOrderIdOrderBySentAtDesc(123L)).thenReturn(Optional.of(notificationEntity));
+        when(notificationMapper.toDto(notificationEntity)).thenReturn(notificationDto);
 
         NotificationDto result = notificationService.getNotificationByOrderId(123L);
 
-        assertThat(result.getOrderId()).isEqualTo("123");
+        assertThat(result.getOrderId()).isEqualTo(123L);
         assertThat(result.getStatus()).isEqualTo("SENT");
         assertThat(result.getChannel()).isEqualTo("EMAIL");
     }

@@ -18,11 +18,11 @@ public interface PaymentService {
 
     List<PaymentResponseDto> findAll();
 
-    PaymentResponseDto processPayment(Long paymentId, PaymentCreateRequestDto dto);
+    PaymentResponseDto processPayment(PaymentCreateRequestDto dto);
     void delete(Long paymentId);
 
     PaymentResponseDto findByOrderId(Long orderId);
-
+    List<PaymentResponseDto> findAllByOrderId(Long orderId);
     List<PaymentResponseDto> findByStatus(PaymentStatus status);
 
     void cacheOrderEmail(Long orderId, String email);

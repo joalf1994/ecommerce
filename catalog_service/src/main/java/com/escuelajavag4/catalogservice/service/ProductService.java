@@ -20,17 +20,9 @@ public interface ProductService {
 
         List<ProductResponseDto> getProductsByCategory(Long categoryId);
 
-        List<ProductResponseDto> getActiveProductsByCategory(Long categoryId);
-
         List<ProductResponseDto> getProductsByMarca(Long marcaId);
 
-        List<ProductResponseDto> getActiveProductsByMarca(Long marcaId);
-
         List<ProductResponseDto> searchProductsByName(String name);
-
-        List<ProductResponseDto> getProductsByCategoryAndMarca(Long categoryId, Long marcaId);
-
-        List<ProductResponseDto> getActiveProductsByCategoryAndMarca(Long categoryId, Long marcaId);
 
         ProductResponseDto updateProduct(Long id, ProductUpdateRequestDto updateRequestDto);
 
